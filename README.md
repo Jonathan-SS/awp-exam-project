@@ -4,10 +4,11 @@ This repo has been initialized with a [mongoose-remix "custom stack" template][c
 
 # Technology stack for this project
 
-- [Tailwind CSS][tailwindcss]
-- [Remix][remix]
-- [Mongoose][mongoose]
 - [React][react]
+- [Remix][remix]
+- [Tailwind CSS][tailwindcss]
+- [MongoDB][mongodb]
+- [Mongoose][mongoose]
 
 [prototype-link]: https://exam-test-app.herokuapp.com/
 [tailwindcss]: https://tailwindcss.com
