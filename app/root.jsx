@@ -7,6 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { useEffect } from "react";
 import styles from "~/tailwind.css";
 
 export const links = () => [
@@ -25,6 +26,12 @@ export function meta() {
 }
 
 export default function App() {
+  useEffect(() => {
+    //checks if the user prefers dark mode
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      document.documentElement.classList.add("dark");
+    }
+  });
   return (
     <html lang="en">
       <head>
