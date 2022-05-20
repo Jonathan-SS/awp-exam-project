@@ -17,6 +17,7 @@ export async function loader({ request }) {
 
 export default function Profile() {
   const user = useLoaderData();
+  console.log(user);
   return (
     <div className="flex gap-8">
       <div className=" h-full w-80 bg-white p-4 rounded-xl">

@@ -141,7 +141,7 @@ export default function Candidates() {
       <ul className="flex py-2 pt-4 gap-4">
         {candidates.map((candidate) => (
           <li key={candidate._id} className=" w-72 bg-white p-4 rounded-xl">
-            <Link to="">
+            <Link to={`/candidates/${candidate._id}`}>
               <div className="">
                 <img
                   src="/403017_avatar_default_head_person_unknown_icon.png"

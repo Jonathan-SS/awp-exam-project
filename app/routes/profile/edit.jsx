@@ -27,10 +27,9 @@ export async function action({ request }) {
   const lastname = form.get("lastname");
   const email = form.get("email");
   const description = form.get("description");
-  let password = form.get("Password");
-  const tags = form.get("tags").split(",");
+  const tags = form.get("tags")?.split(",");
   const linksText = form.get("links");
-  const links = form.get("links").split("\n");
+  const links = form.get("links")?.split("\n");
   const seperatedLinks = [];
   links.forEach((link) => {
     const colon = link.split(":");
@@ -41,19 +40,20 @@ export async function action({ request }) {
   });
 
   try {
-    if (form.get("Password")) {
-      if (form.get("Password") !== form.get("PasswordRepeat")) {
-        console.log("password not the same");
-        return json({
-          errors: {
-            password: "Passwords do not match",
-          },
-        });
+    const passwordCheck = async () => {
+      if (form.get("Password").length > 0) {
+        if (form.get("Password") !== form.get("PasswordRepeat")) {
+          console.log("password not the same");
+          return json({
+            errors: {
+              password: "Passwords do not match",
+            },
+          });
+        }
+        return await bcrypt.hash(form.get("Password"), 10);
       }
-      password = await bcrypt.hash(form.get("Password"), 10);
-    }
-
-    console.log(password);
+    };
+    const password = await passwordCheck();
 
     const user = await db.models.Candidate.updateOne(
       { _id: userId },

@@ -3,6 +3,7 @@ import Logo from "../../icons/Logo";
 import connectDb from "~/db/connectDb.server";
 import bcrypt from "bcryptjs";
 import { json, redirect } from "@remix-run/node";
+import { commitSession, getSession } from "../../sessions.server";
 
 export async function action({ request }) {
   console.log("test");
@@ -32,13 +33,13 @@ export async function action({ request }) {
       password,
     });
     console.log(user);
-    // const session = await getUserSession(request.headers.get("Cookie"));
-    // session.set("userId", user.id);
+    const session = await getSession(request.headers.get("Cookie"));
+    session.set("userId", user.id);
 
     return redirect("/profile", {
       headers: {
         status: 200,
-        // "Set-Cookie": await commitUserSession(session),
+        "Set-Cookie": await commitSession(session),
       },
     });
   } catch (error) {

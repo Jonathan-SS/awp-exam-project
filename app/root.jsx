@@ -1,3 +1,4 @@
+import { redirect } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -5,11 +6,13 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
 import styles from "~/tailwind.css";
 import MenuItem from "./components/MenuItem";
+
 import BurgerMenu from "./icons/BurgerMenu";
 import Candidates from "./icons/Candidates";
 import Close from "./icons/Close";
@@ -20,6 +23,8 @@ import Plus from "./icons/Plus";
 import Posts from "./icons/Posts";
 import Profile from "./icons/Profile";
 import Tools from "./icons/Tools";
+import LogOut from "./icons/LogOut";
+import { getSession } from "./sessions.server";
 
 export const links = () => [
   {
@@ -65,14 +70,27 @@ export function meta() {
   };
 }
 
+export async function loader({ request }) {
+  const cookie = request.headers.get("Cookie");
+  const session = await getSession(cookie);
+  if (session.has("userId")) {
+    return true;
+  }
+  return false;
+}
+
 export default function App() {
   const [navIsOpen, setNavIsOpen] = useState(false);
+  const status = useLoaderData();
+  const [loggedin, setLoggedin] = useState(status);
+
   useEffect(() => {
     //checks if the user prefers dark mode
     if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
       document.documentElement.classList.add("dark");
     }
-  });
+    setLoggedin(status);
+  }, []);
 
   function showMobileMenu() {
     const menu = document.getElementById("menu");
@@ -96,11 +114,20 @@ export default function App() {
           <MenuItem icon={<Home />} label="Home" to="/" />
           <MenuItem icon={<Posts />} label="Job posts" to="/job-posts" />
           <MenuItem icon={<Candidates />} label="Candidates" to="/candidates" />
-          <MenuItem icon={<Profile />} label="Profile" to="/profile" />
-          <MenuItem icon={<Tools />} label="Tools" to="/tools" />
-          <MenuItem icon={<Plus />} label="Create User" to="/create-user" />
+          {loggedin && (
+            <MenuItem icon={<Profile />} label="Profile" to="/profile" />
+          )}
 
-          <MenuItem icon={<LogIn />} label="LogIn" to="/login" />
+          <MenuItem icon={<Tools />} label="Tools" to="/tools" />
+
+          {!loggedin && (
+            <MenuItem icon={<Plus />} label="Create User" to="/create-user" />
+          )}
+          {!loggedin ? (
+            <MenuItem icon={<LogIn />} label="Log In" to="/login" />
+          ) : (
+            <MenuItem icon={<LogOut />} label="Log Out" to="/logout" />
+          )}
         </aside>
         <div className="md:hidden flex justify-center py-1 px-2">
           <div className=" absolute left-0 px-1">
