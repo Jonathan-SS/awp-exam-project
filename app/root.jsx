@@ -15,8 +15,8 @@ import Candidates from "./icons/Candidates";
 import Close from "./icons/Close";
 import Home from "./icons/Home";
 import LogIn from "./icons/LogIn";
-import Logo from "./icons/logo";
-import Plus from "./icons/PLus";
+import Logo from "./icons/Logo";
+import Plus from "./icons/Plus";
 import Posts from "./icons/Posts";
 import Profile from "./icons/Profile";
 import Tools from "./icons/Tools";
@@ -28,29 +28,29 @@ export const links = () => [
   },
   {
     rel: "apple-touch-icon",
-    href: "assets/apple-touch-icon.png",
+    href: "/apple-touch-icon.png",
     sizes: "180x180",
   },
   {
     rel: "icon",
     type: "image/png",
     sizes: "32x32",
-    href: "assets/favicon-32x32.png",
+    href: "/favicon-32x32.png",
   },
   {
     rel: "icon",
     type: "image/png",
     sizes: "16x16",
-    href: "assets/favicon-16x16.png",
+    href: "/favicon-16x16.png",
   },
   {
     rel: "mask-icon",
-    href: "assets/safari-pinned-tab.svg",
+    href: "/safari-pinned-tab.svg",
     color: "#5bbad5",
   },
   {
     rel: "manifest",
-    href: "assets/site.webmanifest",
+    href: "/site.webmanifest",
   },
 ];
 
@@ -91,14 +91,14 @@ export default function App() {
       <body className="bg-slate-100 text-slate-800 font-sans md:flex">
         <aside
           id="menu"
-          className=" absolute md:static -translate-x-full hidden md:translate-x-0 md:flex flex-col h-100vh px-1 md:px-3 py-8 gap-6 "
+          className=" absolute md:fixed -translate-x-full hidden md:translate-x-0 md:flex flex-col h-100vh px-1 md:px-3 py-8 gap-6 "
         >
           <MenuItem icon={<Home />} label="Home" to="/" />
           <MenuItem icon={<Posts />} label="Job posts" to="/job-posts" />
           <MenuItem icon={<Candidates />} label="Candidates" to="/candidates" />
           <MenuItem icon={<Profile />} label="Profile" to="/profile" />
           <MenuItem icon={<Tools />} label="Tools" to="/tools" />
-          <MenuItem icon={<Plus />} label="Create User" to="/login" />
+          <MenuItem icon={<Plus />} label="Create User" to="/create-user" />
 
           <MenuItem icon={<LogIn />} label="LogIn" to="/login" />
         </aside>
@@ -112,7 +112,7 @@ export default function App() {
           <Logo className="h-auto w-20" />
         </div>
 
-        <main className="flex-1 px-4 py-7">
+        <main className="flex-1 px-4 py-7 ml-14">
           <Outlet />
         </main>
 
@@ -123,3 +123,6 @@ export default function App() {
     </html>
   );
 }
+//TODO add catch and ERROR boundry to everything
+//TODO add a 404 page
+//TODO make it work on mobile
