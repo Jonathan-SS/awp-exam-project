@@ -12,22 +12,34 @@ export default function Index() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Remix + Mongoose</h1>
-      <h2 className="text-lg font-bold mb-3">
-        Here are a few of my favorite books:
-      </h2>
-      <ul className="ml-5 list-disc">
-        {books.map((book) => {
-          return (
-            <li key={book._id}>
-              <Link
-                to={`/books/${book._id}`}
-                className="text-blue-600 hover:underline">
-                {book.title}
-              </Link>
-            </li>
-          );
-        })}
+      <h1 className="text-3xl font-bold mb-3">All of our IT cadidates</h1>
+      <ul className="flex p-4">
+        <li className=" w-72 bg-white p-4 rounded-xl">
+          <Link to="">
+            <div className="">
+              <img
+                src="/403017_avatar_default_head_person_unknown_icon.png"
+                alt=""
+              />
+            </div>
+
+            <div className="pt-2 flex flex-col gap-2">
+              <h2 className="text-xl font-semibold">Jens Hansen</h2>
+              <div>
+                <h3 className=" text-lg font-semibold">Bio:</h3>
+                <p> Her skal der står en masse tekst, men max 4 linjer</p>
+              </div>
+
+              <div className="flex gap-2">
+                <p className=" bg-green-400 rounded-full px-2 hover:bg-green-300">
+                  tag1
+                </p>
+                <p>tag2</p>
+              </div>
+              <p>20/02/2022</p>
+            </div>
+          </Link>
+        </li>
       </ul>
     </div>
   );
