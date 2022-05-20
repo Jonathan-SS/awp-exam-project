@@ -3,7 +3,7 @@ import { sessionCookie } from "./cookies.server";
 export const { getSession, commitSession, destroySession } =
   createCookieSessionStorage({ cookie: sessionCookie });
 
-export async function requireUserSession(request) {
+export async function requireSession(request) {
   // get the session
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);

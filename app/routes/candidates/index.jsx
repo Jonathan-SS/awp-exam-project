@@ -1,46 +1,141 @@
-import { useLoaderData, Link, Form } from "@remix-run/react";
+import { useLoaderData, Link, Form, useSubmit } from "@remix-run/react";
+import { useState, useEffect } from "react";
+
 import connectDb from "~/db/connectDb.server.js";
 
-export async function loader() {
+export async function loader({ params, request }) {
   const db = await connectDb();
-  const cadidates = await db.models.Candidate.find();
-  return cadidates;
+  const url = new URL(request.url);
+  const name = url.searchParams.get("name");
+  const tag = url.searchParams.get("tag");
+  const sort = url.searchParams.get("sort");
+  const allParams = { name, tag, sort };
+
+  console.log(name);
+
+  if (tag) {
+    return {
+      candidates: await db.models.Candidate.find(
+        name
+          ? {
+              $or: [
+                {
+                  $and: [
+                    { firstname: { $regex: new RegExp(name, "i") } },
+                    { tags: tag },
+                  ],
+                },
+                {
+                  $and: [
+                    { lastname: { $regex: new RegExp(name, "i") } },
+                    { tags: tag },
+                  ],
+                },
+              ],
+            }
+          : {
+              tags: tag,
+            }
+      ).sort({ [sort]: -1 }),
+      allParams: allParams,
+    };
+  }
+
+  return {
+    candidates: await db.models.Candidate.find(
+      name
+        ? {
+            $or: [
+              {
+                $and: [{ firstname: { $regex: new RegExp(name, "i") } }],
+              },
+              {
+                $and: [{ lastname: { $regex: new RegExp(name, "i") } }],
+              },
+            ],
+          }
+        : {}
+    ).sort({ [sort]: -1 }),
+    allParams: allParams,
+  };
 }
-//make the search and filter work
 
 export default function Candidates() {
-  const candidates = useLoaderData();
+  const submit = useSubmit();
+  const [hasJs, setHasJs] = useState(false);
+  const { candidates, allParams } = useLoaderData();
+  function handleChange(event) {
+    submit(event.currentTarget, { replace: true });
+  }
+
+  useEffect(() => {
+    setHasJs(true);
+  }, []);
 
   return (
     <div>
       <h1 className="text-3xl font-bold mb-3">All of our IT cadidates</h1>
       <div className="flex items-center gap-4">
-        <Form>
+        <Form method="get" onChange={handleChange}>
           <input
             className=" p-2 rounded-full mr-2"
-            type="text"
+            type="search"
+            name="name"
             placeholder="Search..."
+            defaultValue={allParams.name}
           />
-          <button
-            type="submit"
-            className=" bg-green-400 px-3 py-2 rounded-full"
+          {!hasJs && (
+            <button
+              type="submit"
+              className=" bg-green-400 px-3 py-2 rounded-full  mr-4"
+            >
+              Search
+            </button>
+          )}
+
+          <select
+            name="sort"
+            type="sort"
+            className="p-2 rounded-full mr-2  "
+            defaultValue={{ label: allParams.sort, value: allParams.sort }}
           >
-            Search
-          </button>
-        </Form>
-        <Form method="post" className="flex">
-          <select name="tag" id="" className="  p-2 rounded-full mr-2">
-            <option value="">All</option>
-            <option value="react">React</option>
+            <option value="" selected>
+              Sort by
+            </option>
+            <option value="firstname">First Name</option>
+            <option value="lastname">Last Name</option>
+            <option value="createdAt">Date</option>
+          </select>
+          {!hasJs && (
+            <button
+              type="submit"
+              className=" bg-green-400 px-3 py-2 rounded-full mr-4"
+            >
+              Sort
+            </button>
+          )}
+
+          <select
+            name="tag"
+            type="tag"
+            id=""
+            className="p-2 rounded-full mr-2"
+            defaultValue={{ label: allParams.tag, value: allParams.tag }}
+          >
+            <option value="" selected>
+              Technology
+            </option>
+            <option value="WP">WP</option>
             <option value="vue">Vue</option>
           </select>
-
-          <button
-            type="submit"
-            className=" bg-green-400 px-3 py-2 rounded-full"
-          >
-            Filter
-          </button>
+          {!hasJs && (
+            <button
+              type="submit"
+              className=" bg-green-400 px-3 py-2 rounded-full  mr-4"
+            >
+              Apply
+            </button>
+          )}
         </Form>
       </div>
       <ul className="flex py-2 pt-4 gap-4">
