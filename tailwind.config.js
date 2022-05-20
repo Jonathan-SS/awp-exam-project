@@ -1,7 +1,11 @@
 module.exports = {
   content: ["./app/**/*.{jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      height: {
+        "100vh": "100vh",
+      },
+    },
   },
   plugins: [],
 };
