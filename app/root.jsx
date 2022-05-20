@@ -10,6 +10,7 @@ import { useEffect } from "react";
 
 import styles from "~/tailwind.css";
 import MenuItem from "./components/MenuItem";
+import BurgerMenu from "./icons/BurgerMenu";
 import Candidates from "./icons/Candidates";
 import Home from "./icons/Home";
 import LogIn from "./icons/LogIn";
@@ -75,14 +76,18 @@ export default function App() {
         <Links />
       </head>
       <body className="bg-slate-100 text-slate-800 font-sans flex">
-        <aside className=" flex flex-col h-100vh px-3 py-8 gap-6 ">
+        <div className="md:hidden">
+          <BurgerMenu />
+        </div>
+        <aside className="flex flex-col h-100vh px-3 py-8 gap-6 ">
           <MenuItem icon={<Home />} label="Home" to="/" />
-          <MenuItem icon={<Posts />} label="Posts" to="/posts" />
+          <MenuItem icon={<Posts />} label="Job posts" to="/job-posts" />
           <MenuItem icon={<Candidates />} label="Candidates" to="/candidates" />
           <MenuItem icon={<Profile />} label="Profile" to="/profile" />
           <MenuItem icon={<Tools />} label="Tools" to="/tools" />
-          <MenuItem icon={<LogIn />} label="Log In" to="/login" />
+          <MenuItem icon={<LogIn />} label="LogIn" to="/login" />
         </aside>
+
         <main className="flex-1">
           <Outlet />
         </main>

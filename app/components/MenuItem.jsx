@@ -1,8 +1,23 @@
 import { NavLink } from "react-router-dom";
 
 export default function MenuItem({ icon, label, to }) {
+  function showToolTip(item) {
+    const tooltip = document.getElementById(`${item}-ToolTip`);
+    tooltip.classList.toggle("hidden");
+  }
+  function hideToolTip(item) {
+    const tooltip = document.getElementById(`${item}-ToolTip`);
+    tooltip.classList.toggle("hidden");
+  }
+
   return (
     <NavLink
+      onMouseEnter={() => {
+        showToolTip(label);
+      }}
+      onMouseLeave={() => {
+        hideToolTip(label);
+      }}
       to={to}
       className={({ isActive }) =>
         "rounded-full p-2 last-of-type:mt-auto " +
@@ -12,7 +27,14 @@ export default function MenuItem({ icon, label, to }) {
       }
     >
       {icon}
-      <div className=" absolute left-0">{label}</div>
+      <div className="relative">
+        <div
+          id={`${label}-ToolTip`}
+          className=" whitespace-nowrap line w-fit hidden absolute left-9 -bottom-1 bg-white rounded-full px-3 py-1 "
+        >
+          {label}
+        </div>
+      </div>
     </NavLink>
   );
 }
