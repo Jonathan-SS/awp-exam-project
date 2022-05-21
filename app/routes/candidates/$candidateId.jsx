@@ -41,7 +41,12 @@ export default function Profile() {
             <div>
               {user.links
                 ? user.links?.map((link) => (
-                    <a key={link.name} href={link.url}>
+                    <a
+                      key={link.name}
+                      rel="noreferrer"
+                      target="_blank"
+                      href={link.url}
+                    >
                       {link.name}
                     </a>
                   ))

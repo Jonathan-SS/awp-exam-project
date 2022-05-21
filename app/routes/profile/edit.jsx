@@ -1,9 +1,17 @@
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form, useLoaderData, useSubmit } from "@remix-run/react";
 import Logo from "../../icons/Logo";
 import connectDb from "~/db/connectDb.server";
 import bcrypt from "bcryptjs";
-import { json, redirect } from "@remix-run/node";
+import {
+  json,
+  redirect,
+  unstable_parseMultipartFormData,
+  unstable_createFileUploadHandler,
+} from "@remix-run/node";
 import { getSession } from "../../sessions.server";
+import Plus from "../../icons/Plus";
+import useJs from "../../hooks/useJs";
+
 //TODO add delete prfile option
 export async function loader({ request }) {
   const db = await connectDb();
@@ -22,17 +30,42 @@ export async function action({ request }) {
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);
   const userId = session.get("userId");
+
+  const fileUploadHandler = unstable_createFileUploadHandler({
+    directory: "./public/uploads",
+    file: ({ filename }) => filename,
+    filepath: ({ filename }) => `/uploads/${filename}`,
+  });
+
+  const formData = await unstable_parseMultipartFormData(
+    request,
+    fileUploadHandler
+  );
+  if (formData.get("_actionAfterSubmit") === "deleteAccount") {
+    console.log("delete account");
+  }
+
+  console.log(formData.get("image")); // will return the filename
+  const image = formData.get("image");
+  if (image) {
+    const imageUpload = await db.models.Candidate.findByIdAndUpdate(userId, {
+      image: image,
+    });
+    console.log(imageUpload.image);
+    console.log("herover");
+  }
+
   const form = await request.formData();
-  const firstname = form.get("firstname").trim();
-  const lastname = form.get("lastname");
-  const email = form.get("email");
-  const description = form.get("description");
-  const tags = form.get("tags")?.split(",");
-  const linksText = form.get("links");
-  const links = form.get("links")?.split("\n");
+  const firstname = formData.get("firstname").trim();
+  const lastname = formData.get("lastname");
+  const email = formData.get("email");
+  const description = formData.get("description");
+  const tags = formData.get("tags")?.split(",");
+  const linksText = formData.get("links");
+  const links = formData.get("links")?.split("\n");
   const seperatedLinks = [];
   links.forEach((link) => {
-    const colon = link.split(":");
+    const colon = link.split(";");
     seperatedLinks.push({
       name: colon[0],
       url: colon[1],
@@ -41,8 +74,8 @@ export async function action({ request }) {
 
   try {
     const passwordCheck = async () => {
-      if (form.get("Password").length > 0) {
-        if (form.get("Password") !== form.get("PasswordRepeat")) {
+      if (formData.get("Password").length > 0) {
+        if (formData.get("Password") !== formData.get("PasswordRepeat")) {
           console.log("password not the same");
           return json({
             errors: {
@@ -50,12 +83,12 @@ export async function action({ request }) {
             },
           });
         }
-        return await bcrypt.hash(form.get("Password"), 10);
+        return await bcrypt.hash(formData.get("Password"), 10);
       }
     };
     const password = await passwordCheck();
 
-    const user = await db.models.Candidate.updateOne(
+    await db.models.Candidate.updateOne(
       { _id: userId },
       {
         firstname,
@@ -68,13 +101,15 @@ export async function action({ request }) {
         links: seperatedLinks,
       }
     );
-    console.log(user);
 
-    return redirect("/profile", {
-      headers: {
-        status: 200,
-      },
-    });
+    if (formData.get("_actionAfterSubmit") === "redirect") {
+      return redirect("/profile", {
+        headers: {
+          status: 200,
+        },
+      });
+    }
+    return null;
   } catch (error) {
     console.log(error);
     return json(
@@ -86,6 +121,15 @@ export async function action({ request }) {
 
 export default function Candidate() {
   const user = useLoaderData();
+
+  const submit = useSubmit();
+  function handleChange(event) {
+    submit(event.currentTarget, { replace: true });
+  }
+  function handleDelete(event) {
+    submit(null, { method: "post", action: "../deleteAccount" });
+  }
+
   return (
     <div className="flex flex-col items-center">
       <Logo />
@@ -95,7 +139,41 @@ export default function Candidate() {
         </h1>
       </div>
 
-      <Form method="post" className="flex flex-col gap-4 w-96">
+      <Form
+        method="post"
+        encType="multipart/form-data"
+        className="flex flex-col gap-4 w-96"
+        onChange={handleChange}
+        reloadDocument
+      >
+        <div className=" relative">
+          <img
+            src={
+              user.image
+                ? `/uploads/${user.image.name}`
+                : "/403017_avatar_default_head_person_unknown_icon.png"
+            }
+            id="image"
+            alt=""
+            className=" w-64 h-64 m-auto rounded-full content object-cover bg-white  "
+          />
+
+          <label
+            for="file-upload"
+            className="rounded-full p-4 hover:shadow-md w-fit bg-white shadow-lg hover:cursor-pointer"
+          >
+            <Plus />
+          </label>
+
+          <input id="file-upload" type="file" name="image" className="hidden" />
+        </div>
+      </Form>
+      <Form
+        method="post"
+        encType="multipart/form-data"
+        className="flex flex-col gap-4 w-96"
+        reloadDocument
+      >
         <input
           type="text"
           name="firstname"
@@ -165,17 +243,33 @@ export default function Candidate() {
           name="links"
           cols="30"
           rows="4"
-          placeholder="Max. 3 links. Seperate with new line. Facebook:https://www.facebook.com "
+          placeholder="Max. 3 links. Seperate with new line. Facebook;https://www.facebook.com "
           className=" w-full py-2 px-4 rounded-lg border border-gray-300"
           defaultValue={user.linksAsText}
         />
         <button
           type="submit"
           className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md"
+          name="_actionAfterSubmit"
+          value="redirect"
         >
           Update
+        </button>
+        <button
+          className=" bg-red-500 px-3 py-2 rounded-full hover:bg-red-400 shadow-lg hover:shadow-md"
+          name="_actionAfterSubmit"
+          value="deleteAccount"
+          onClick={() => {
+            if (confirm("Are you sure you want to delete your account?")) {
+              handleDelete();
+            }
+          }}
+        >
+          Delete my user
         </button>
       </Form>
     </div>
   );
 }
+
+//TODO: move buttons and links in to a seperate component, so they can be reused in the forms

@@ -8,8 +8,9 @@ export async function requireSession(request) {
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);
   if (!session.has("userId")) {
-    throw redirect("/login");
+    throw redirect("/login", 302);
   }
 
   return session;
 }
+//TODO fix requireSession som ot doesn't crash site
