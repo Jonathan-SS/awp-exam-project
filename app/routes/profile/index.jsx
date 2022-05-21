@@ -8,7 +8,7 @@ import useJs from "../../hooks/useJs";
 
 //TODO add option to change image and add one
 export async function loader({ request, params }) {
-  requireSession(request);
+  await requireSession(request);
   const db = await connectDb();
   const cookie = request.headers.get("Cookie");
 
@@ -142,3 +142,9 @@ export default function Profile() {
     </div>
   );
 }
+
+//TODO set up ability to add a post to profile and delete it
+//TODO set up way to use markdown to add a post
+//TODO add a profile page for recruiters where they can post jobs
+
+//TODO setup a

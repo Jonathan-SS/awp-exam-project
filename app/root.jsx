@@ -27,6 +27,7 @@ import Tools from "./icons/Tools";
 import LogOut from "./icons/LogOut";
 import { getSession } from "./sessions.server";
 import { Link } from "react-router-dom";
+import Bug from "./illustrations/Bug";
 
 export const links = () => [
   {
@@ -83,7 +84,7 @@ export async function loader({ request }) {
 
 export default function App() {
   const status = useLoaderData();
-  const [loggedin, setLoggedin] = useState(status);
+  const [loggedin, setLoggedin] = useState(false);
 
   useEffect(() => {
     //checks if the user prefers dark mode
@@ -91,17 +92,18 @@ export default function App() {
       document.documentElement.classList.add("dark");
     }
     setLoggedin(status);
-  }, []);
+  }, [status]);
 
   return (
-    <Layout>
+    <Layout loggedin={loggedin}>
       <Outlet />
     </Layout>
   );
 }
 
-export function Layout({ children }) {
+export function Layout({ children, ...rest }) {
   const [navIsOpen, setNavIsOpen] = useState(false);
+  const { loggedin } = rest;
   function showMobileMenu() {
     const menu = document.getElementById("menu");
     menu.classList.toggle("hidden");
@@ -123,16 +125,20 @@ export function Layout({ children }) {
           <MenuItem icon={<Home />} label="Home" to="/" />
           <MenuItem icon={<Posts />} label="Job posts" to="/job-posts" />
           <MenuItem icon={<Candidates />} label="Candidates" to="/candidates" />
-
-          <MenuItem icon={<Profile />} label="Profile" to="/profile" />
+          {loggedin ? (
+            <MenuItem icon={<Profile />} label="Profile" to="/profile" />
+          ) : null}
 
           <MenuItem icon={<Tools />} label="Tools" to="/tools" />
+          {!loggedin ? (
+            <MenuItem icon={<Plus />} label="Create User" to="/create-user" />
+          ) : null}
 
-          <MenuItem icon={<Plus />} label="Create User" to="/create-user" />
-
-          <MenuItem icon={<LogIn />} label="Log In" to="/login" />
-
-          <MenuItem icon={<LogOut />} label="Log Out" to="/logout" />
+          {loggedin ? (
+            <MenuItem icon={<LogOut />} label="Logout" to="/logout" />
+          ) : (
+            <MenuItem icon={<LogIn />} label="Login" to="/login" />
+          )}
         </aside>
         <div className="md:hidden flex justify-center py-1 px-2">
           <div className=" absolute left-0 px-1">
@@ -159,6 +165,7 @@ export function CatchBoundary() {
   return (
     <Layout>
       <main className=" flex justify-center items-center col-span-5 flex-col ">
+        <Bug />
         <h1 className=" text-5xl font-bold">{caught.statusText}</h1>
         <Link
           className="text-white flex items-center h-fit  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mt-4"
@@ -175,6 +182,7 @@ export function ErrorBoundary({ error }) {
   return (
     <Layout>
       <main className=" flex justify-center items-center col-span-5 flex-col ">
+        <Bug />
         <h1 className="text-red-500 font-bold">
           {error.name}: {error.message}
         </h1>
@@ -188,7 +196,8 @@ export function ErrorBoundary({ error }) {
     </Layout>
   );
 }
-//TODO add catch and ERROR boundry to everything
-//TODO add a 404 page
+//TODOne add catch and ERROR boundry to everything
+//TODOne add a 404 page
 //TODO make it work on mobile
-// TODO: find a way to check if the user is logged in for the Navbar
+// TODOne: find a way to check if the user is logged in for the Navbar
+//TODO: add ability to report bugs maybe?

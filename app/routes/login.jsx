@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { json, redirect } from "@remix-run/node";
 import { Link } from "react-router-dom";
 import { commitSession, getSession } from "../sessions.server";
-//TODO: add logout funcitonality
+
 export async function action({ request }) {
   console.log("test");
   const db = await connectDb();
@@ -70,9 +70,9 @@ export default function LogIn(params) {
 
       <Form method="post" className="flex flex-col gap-2 w-96">
         {actionData?.errors?.email ? (
-          <p className="text-red-500 px-2">{actionData?.errors.email}</p>
+          <p className="text-red-500 px-2 ">{actionData?.errors.email}</p>
         ) : (
-          <p></p>
+          <p className=" -mb-2 px-2 text-slate-400 ">Email</p>
         )}
         <input
           type="text"
@@ -81,14 +81,14 @@ export default function LogIn(params) {
           className={
             "w-full py-2 px-4 rounded-full border " +
             (actionData?.errors.email
-              ? "border-red-500 -mt-4"
+              ? "border-red-500 -mt-2"
               : "  border-gray-300 ")
           }
         />
         {actionData?.errors?.password ? (
           <p className="text-red-500 px-2">{actionData?.errors.password}</p>
         ) : (
-          <p></p>
+          <p className=" -mb-2 px-2 text-slate-400 ">Password</p>
         )}
 
         <input
@@ -98,7 +98,7 @@ export default function LogIn(params) {
           className={
             "w-full py-2 px-4 rounded-full border " +
             (actionData?.errors.password
-              ? "border-red-500 -mt-4 "
+              ? "border-red-500 -mt-2"
               : "  border-gray-300 ")
           }
         />

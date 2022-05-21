@@ -2,45 +2,17 @@ import { useLoaderData, Link, Form, useSubmit } from "@remix-run/react";
 import { useState, useEffect } from "react";
 
 import connectDb from "~/db/connectDb.server.js";
-import useJs from "../../hooks/useJs";
+import useJs from "../../../hooks/useJs";
 
 export async function loader({ params, request }) {
   const db = await connectDb();
   const url = new URL(request.url);
   const name = url.searchParams.get("name");
-  const tag = url.searchParams.get("tag");
   const sort = url.searchParams.get("sort");
+  const tag = params.tagName;
   const allParams = { name, tag, sort };
 
   console.log(name);
-
-  if (tag) {
-    return {
-      candidates: await db.models.Candidate.find(
-        name
-          ? {
-              $or: [
-                {
-                  $and: [
-                    { firstname: { $regex: new RegExp(name, "i") } },
-                    { tags: tag },
-                  ],
-                },
-                {
-                  $and: [
-                    { lastname: { $regex: new RegExp(name, "i") } },
-                    { tags: tag },
-                  ],
-                },
-              ],
-            }
-          : {
-              tags: tag,
-            }
-      ).sort({ [sort]: -1 }),
-      allParams: allParams,
-    };
-  }
 
   return {
     candidates: await db.models.Candidate.find(
@@ -48,20 +20,28 @@ export async function loader({ params, request }) {
         ? {
             $or: [
               {
-                $and: [{ firstname: { $regex: new RegExp(name, "i") } }],
+                $and: [
+                  { firstname: { $regex: new RegExp(name, "i") } },
+                  { tags: tag },
+                ],
               },
               {
-                $and: [{ lastname: { $regex: new RegExp(name, "i") } }],
+                $and: [
+                  { lastname: { $regex: new RegExp(name, "i") } },
+                  { tags: tag },
+                ],
               },
             ],
           }
-        : {}
+        : {
+            tags: tag,
+          }
     ).sort({ [sort]: -1 }),
     allParams: allParams,
   };
 }
 
-export default function Candidates() {
+export default function Tag() {
   const submit = useSubmit();
 
   const hasJs = useJs();

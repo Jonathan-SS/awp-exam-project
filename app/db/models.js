@@ -55,14 +55,24 @@ const candiateSchema = new Schema(
 );
 const recruiterSchema = new Schema(
   {
-    name: {
+    company: {
       type: String,
-      required: true,
+      required: [true, "Company is required"],
+      minLength: [3, "That's too short"],
+    },
+    firstname: {
+      type: String,
+      required: [true, "First Name is required"],
+      minLength: [3, "That's too short"],
+    },
+    lastname: {
+      type: String,
+      required: [true, "Last Name is required"],
       minLength: [3, "That's too short"],
     },
     email: {
       type: String,
-      required: true,
+      required: [true, "Email is required"],
       unique: true,
     },
     password: {
@@ -70,10 +80,7 @@ const recruiterSchema = new Schema(
       required: true,
       minLength: [6, "That's too short"],
     },
-    company: {
-      type: String,
-      required: true,
-    },
+
     image: {
       type: String,
       required: true,

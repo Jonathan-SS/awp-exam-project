@@ -4,6 +4,7 @@ import connectDb from "~/db/connectDb.server";
 import bcrypt from "bcryptjs";
 import { json, redirect } from "@remix-run/node";
 import { commitSession, getSession } from "../../sessions.server";
+import InputField from "../../components/InputFiled";
 
 export async function action({ request }) {
   console.log("test");
@@ -55,7 +56,7 @@ export async function action({ request }) {
 
 export default function Candidate(params) {
   const actionData = useActionData();
-  console.log(actionData);
+
   return (
     <div className="flex flex-col items-center">
       <Logo />
@@ -66,89 +67,37 @@ export default function Candidate(params) {
       </div>
 
       <Form method="post" className="flex flex-col gap-2 w-96">
-        {actionData?.errors?.firstname?.message ? (
-          <p className="text-red-500 px-2">
-            {actionData.errors.firstname.message}
-          </p>
-        ) : (
-          <p className=" -mb-2 px-2 text-slate-400 ">First Name</p>
-        )}
-        <input
-          type="text"
+        <InputField
           name="firstname"
           placeholder="First Name"
-          defaultValue={actionData?.values?.firstname}
-          className={
-            "w-full py-2 px-4 rounded-full border " +
-            (actionData?.errors?.firstname?.message
-              ? "border-red-500"
-              : "  border-gray-300 ")
-          }
+          actionData={actionData?.errors.firstname}
+          defaultValue={actionData?.values.firstname}
         />
-        {actionData?.errors?.lastname ? (
-          <p className="text-red-500 px-2">
-            {actionData.errors?.lastname.message}
-          </p>
-        ) : (
-          <p className=" -mb-2 px-2 text-slate-400 ">Last Name</p>
-        )}
-        <input
-          type="text"
+        <InputField
           name="lastname"
           placeholder="Last Name"
-          defaultValue={actionData?.values?.lastname}
-          className={
-            "w-full py-2 px-4 rounded-full border " +
-            (actionData?.errors.lastname
-              ? "border-red-500"
-              : "  border-gray-300 ")
-          }
+          actionData={actionData?.errors.lastname}
+          defaultValue={actionData?.values.lastname}
         />
-        {actionData?.errors?.email ? (
-          <p className="text-red-500 px-2">
-            {actionData.errors?.email.message}
-          </p>
-        ) : (
-          <p className=" -mb-2 px-2 text-slate-400 ">Email</p>
-        )}
-        <input
-          type="text"
+        <InputField
           name="email"
           placeholder="Email"
-          defaultValue={actionData?.values?.email}
-          className={
-            "w-full py-2 px-4 rounded-full border " +
-            (actionData?.errors.email ? "border-red-500" : "  border-gray-300 ")
-          }
+          actionData={actionData?.errors.email}
+          defaultValue={actionData?.values.email}
         />
-        <p htmlFor="Password" className=" -mb-2 px-2 text-slate-400 ">
-          Password, minimum 8 characters
-        </p>
-        <input
-          type="text"
+        <InputField
           name="Password"
-          placeholder="Password"
-          defaultValue={actionData?.values?.Password}
-          className={
-            "w-full py-2 px-4 rounded-full border " +
-            (actionData?.errors.password
-              ? "border-red-500"
-              : "  border-gray-300 ")
-          }
+          placeholder="Password, minimum 8 characters"
+          actionData={actionData?.errors.Password}
+          defaultValue={actionData?.values.Password}
         />
-
-        {actionData?.errors?.password ? (
-          <p className="text-red-500 px-2">{actionData.errors.password}</p>
-        ) : (
-          <p className=" -mb-2 px-2 text-slate-400 ">Repeat password</p>
-        )}
-        <input
-          type="text"
+        <InputField
           name="PasswordRepeat"
           placeholder="Repeat password"
-          defaultValue={actionData?.values?.PasswordRepeat}
-          className=" w-full py-2 px-4 rounded-full border border-gray-300"
+          actionData={actionData?.errors.PasswordRepeat}
+          defaultValue={actionData?.values.PasswordRepeat}
         />
+
         <button
           type="submit"
           className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md"

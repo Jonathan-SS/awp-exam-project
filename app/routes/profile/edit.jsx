@@ -8,12 +8,13 @@ import {
   unstable_parseMultipartFormData,
   unstable_createFileUploadHandler,
 } from "@remix-run/node";
-import { getSession } from "../../sessions.server";
+import { getSession, requireSession } from "../../sessions.server";
 import Plus from "../../icons/Plus";
 import useJs from "../../hooks/useJs";
 
 //TODO add delete prfile option
 export async function loader({ request }) {
+  await requireSession(request);
   const db = await connectDb();
   const cookie = request.headers.get("Cookie");
 
@@ -127,7 +128,7 @@ export default function Candidate() {
     submit(event.currentTarget, { replace: true });
   }
   function handleDelete(event) {
-    submit(null, { method: "post", action: "../deleteAccount" });
+    submit(null, { method: "post", action: "../delete-account" });
   }
 
   return (
