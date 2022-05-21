@@ -99,9 +99,7 @@ export default function Candidates() {
             className="p-2 rounded-full mr-2  "
             defaultValue={{ label: allParams.sort, value: allParams.sort }}
           >
-            <option value="" selected>
-              Sort by
-            </option>
+            <option value="">Sort by</option>
             <option value="firstname">First Name</option>
             <option value="lastname">Last Name</option>
             <option value="createdAt">Date</option>
@@ -122,9 +120,7 @@ export default function Candidates() {
             className="p-2 rounded-full mr-2"
             defaultValue={{ label: allParams.tag, value: allParams.tag }}
           >
-            <option value="" selected>
-              Technology
-            </option>
+            <option value="">Technology</option>
             <option value="WP">WP</option>
             <option value="vue">Vue</option>
           </select>
@@ -138,36 +134,39 @@ export default function Candidates() {
           )}
         </Form>
       </div>
-      <ul className="flex py-2 pt-4 gap-4">
+      <ul className="flex py-2 pt-4 gap-4 flex-wrap justify-start">
         {candidates.map((candidate) => (
-          <li key={candidate._id} className=" w-72 bg-white p-4 rounded-xl">
+          <li
+            key={candidate._id}
+            className="w-72 bg-white p-4 rounded-xl grow min-w-xs max-w-xs "
+          >
             <Link to={`/candidates/${candidate._id}`}>
-              <div className="">
+              <div className="flex">
                 <img
                   src="/403017_avatar_default_head_person_unknown_icon.png"
                   alt=""
+                  className="w-24 h-24 rounded-full mr-4"
                 />
-              </div>
-              <div className="pt-2 flex flex-col gap-2">
-                <h2 className="text-xl font-semibold">
-                  {`${candidate.firstname} ${candidate.lastname}`}
-                </h2>
-
-                <p>{candidate.description}</p>
-                <div className="flex gap-2">
-                  <div className="flex gap-2">
-                    {candidate.tags.length > 0
-                      ? candidate.tags?.map((tag) => (
-                          <p
-                            key={tag}
-                            className=" bg-green-400 rounded-full px-2 hover:bg-green-300"
-                          >
-                            {tag}
-                          </p>
-                        ))
-                      : " Looks like you haven't added any tags to your profile. Go To Edit profile to add some."}
+                <div>
+                  <h2 className="text-xl font-semibold">
+                    {`${candidate.firstname} ${candidate.lastname}`}
+                  </h2>
+                  <div className="flex gap-2 flex-wrap">
+                    {candidate.tags?.map((tag) => (
+                      <p
+                        key={tag}
+                        className=" bg-green-400 rounded-full px-2 hover:bg-green-300"
+                      >
+                        {tag}
+                      </p>
+                    ))}
                   </div>
                 </div>
+              </div>
+
+              <div className="pt-2 flex flex-col gap-2">
+                <p>{candidate.description}</p>
+                <div className="flex gap-2"></div>
                 <p className=" text-slate-400 text-sm">
                   {"Created: " +
                     candidate.createdAt.slice(8, 10) +

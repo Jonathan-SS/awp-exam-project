@@ -1,9 +1,10 @@
 import { Form, useLoaderData } from "@remix-run/react";
 import { Link } from "react-router-dom";
 import connectDb from "~/db/connectDb.server";
-import { getSession } from "../../sessions.server";
+import { getSession, requireSession } from "../../sessions.server";
 //TODO add option to change image and add one
-export async function loader({ request }) {
+export async function loader({ request, params }) {
+  requireSession(request);
   const db = await connectDb();
   const cookie = request.headers.get("Cookie");
 

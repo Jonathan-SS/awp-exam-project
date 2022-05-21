@@ -6,23 +6,23 @@ const candiateSchema = new Schema(
   {
     firstname: {
       type: String,
-      required: true,
+      required: [true, "First Name is required"],
       minLength: [3, "That's too short"],
     },
     lastname: {
       type: String,
-      required: true,
+      required: [true, "Last Name is required"],
       minLength: [3, "That's too short"],
     },
     email: {
       type: String,
-      required: true,
+      required: [true, "Email is required"],
       unique: true,
     },
     password: {
       type: String,
       required: true,
-      minLength: [6, "That's too short"],
+      minLength: [8, "Password too short"],
     },
     tags: {
       type: [String],

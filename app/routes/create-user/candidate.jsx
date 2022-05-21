@@ -1,4 +1,4 @@
-import { Form } from "@remix-run/react";
+import { Form, useActionData } from "@remix-run/react";
 import Logo from "../../icons/Logo";
 import connectDb from "~/db/connectDb.server";
 import bcrypt from "bcryptjs";
@@ -16,12 +16,14 @@ export async function action({ request }) {
 
   try {
     if (form.get("Password") !== form.get("PasswordRepeat")) {
-      console.log("password not the same");
-      return json({
-        errors: {
-          password: "Passwords do not match",
+      return json(
+        {
+          errors: {
+            password: "Passwords do not match.",
+          },
         },
-      });
+        { status: 400 }
+      );
     }
     const password = await bcrypt.hash(form.get("Password"), 10);
     console.log(password);
@@ -51,7 +53,9 @@ export async function action({ request }) {
   }
 }
 
-export default function candidate(params) {
+export default function Candidate(params) {
+  const actionData = useActionData();
+  console.log(actionData);
   return (
     <div className="flex flex-col items-center">
       <Logo />
@@ -61,38 +65,88 @@ export default function candidate(params) {
         </h1>
       </div>
 
-      <Form method="post" className="flex flex-col gap-4 w-96">
+      <Form method="post" className="flex flex-col gap-2 w-96">
+        {actionData?.errors?.firstname?.message ? (
+          <p className="text-red-500 px-2">
+            {actionData.errors.firstname.message}
+          </p>
+        ) : (
+          <p className=" -mb-2 px-2 text-slate-400 ">First Name</p>
+        )}
         <input
           type="text"
           name="firstname"
           placeholder="First Name"
-          className=" w-full py-2 px-4 rounded-full border border-gray-300"
+          defaultValue={actionData?.values?.firstname}
+          className={
+            "w-full py-2 px-4 rounded-full border " +
+            (actionData?.errors?.firstname?.message
+              ? "border-red-500"
+              : "  border-gray-300 ")
+          }
         />
+        {actionData?.errors?.lastname ? (
+          <p className="text-red-500 px-2">
+            {actionData.errors?.lastname.message}
+          </p>
+        ) : (
+          <p className=" -mb-2 px-2 text-slate-400 ">Last Name</p>
+        )}
         <input
           type="text"
           name="lastname"
           placeholder="Last Name"
-          className=" w-full py-2 px-4 rounded-full border border-gray-300"
+          defaultValue={actionData?.values?.lastname}
+          className={
+            "w-full py-2 px-4 rounded-full border " +
+            (actionData?.errors.lastname
+              ? "border-red-500"
+              : "  border-gray-300 ")
+          }
         />
+        {actionData?.errors?.email ? (
+          <p className="text-red-500 px-2">
+            {actionData.errors?.email.message}
+          </p>
+        ) : (
+          <p className=" -mb-2 px-2 text-slate-400 ">Email</p>
+        )}
         <input
           type="text"
           name="email"
           placeholder="Email"
-          className=" w-full py-2 px-4 rounded-full border border-gray-300"
+          defaultValue={actionData?.values?.email}
+          className={
+            "w-full py-2 px-4 rounded-full border " +
+            (actionData?.errors.email ? "border-red-500" : "  border-gray-300 ")
+          }
         />
+        <p htmlFor="Password" className=" -mb-2 px-2 text-slate-400 ">
+          Password, minimum 8 characters
+        </p>
         <input
           type="text"
           name="Password"
           placeholder="Password"
-          className=" w-full py-2 px-4 rounded-full border border-gray-300"
+          defaultValue={actionData?.values?.Password}
+          className={
+            "w-full py-2 px-4 rounded-full border " +
+            (actionData?.errors.password
+              ? "border-red-500"
+              : "  border-gray-300 ")
+          }
         />
-        <p htmlFor="Password" className=" -my-3 px-2 text-slate-400">
-          Minimum 8 characters
-        </p>
+
+        {actionData?.errors?.password ? (
+          <p className="text-red-500 px-2">{actionData.errors.password}</p>
+        ) : (
+          <p className=" -mb-2 px-2 text-slate-400 ">Repeat password</p>
+        )}
         <input
           type="text"
           name="PasswordRepeat"
           placeholder="Repeat password"
+          defaultValue={actionData?.values?.PasswordRepeat}
           className=" w-full py-2 px-4 rounded-full border border-gray-300"
         />
         <button
