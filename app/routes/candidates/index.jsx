@@ -2,6 +2,7 @@ import { useLoaderData, Link, Form, useSubmit } from "@remix-run/react";
 import { useState, useEffect } from "react";
 
 import connectDb from "~/db/connectDb.server.js";
+import useJs from "../../hooks/useJs";
 
 export async function loader({ params, request }) {
   const db = await connectDb();
@@ -62,15 +63,12 @@ export async function loader({ params, request }) {
 
 export default function Candidates() {
   const submit = useSubmit();
-  const [hasJs, setHasJs] = useState(false);
+
+  const hasJs = useJs();
   const { candidates, allParams } = useLoaderData();
   function handleChange(event) {
     submit(event.currentTarget, { replace: true });
   }
-
-  useEffect(() => {
-    setHasJs(true);
-  }, []);
 
   return (
     <div>
@@ -87,7 +85,7 @@ export default function Candidates() {
           {!hasJs && (
             <button
               type="submit"
-              className=" bg-green-400 px-3 py-2 rounded-full  mr-4"
+              className="  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mr-4"
             >
               Search
             </button>
@@ -107,7 +105,7 @@ export default function Candidates() {
           {!hasJs && (
             <button
               type="submit"
-              className=" bg-green-400 px-3 py-2 rounded-full mr-4"
+              className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mr-4"
             >
               Sort
             </button>
@@ -127,7 +125,7 @@ export default function Candidates() {
           {!hasJs && (
             <button
               type="submit"
-              className=" bg-green-400 px-3 py-2 rounded-full  mr-4"
+              className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mr-4"
             >
               Apply
             </button>

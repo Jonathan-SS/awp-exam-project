@@ -32,7 +32,8 @@ const candiateSchema = new Schema(
       minLength: [10, "That's too short"],
     },
     image: {
-      type: String,
+      data: Buffer,
+      contentType: String,
     },
     links: {
       type: [

@@ -6,6 +6,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useCatch,
   useLoaderData,
 } from "@remix-run/react";
 import { useEffect, useState } from "react";
@@ -25,6 +26,7 @@ import Profile from "./icons/Profile";
 import Tools from "./icons/Tools";
 import LogOut from "./icons/LogOut";
 import { getSession } from "./sessions.server";
+import { Link } from "react-router-dom";
 
 export const links = () => [
   {
@@ -80,7 +82,6 @@ export async function loader({ request }) {
 }
 
 export default function App() {
-  const [navIsOpen, setNavIsOpen] = useState(false);
   const status = useLoaderData();
   const [loggedin, setLoggedin] = useState(status);
 
@@ -92,6 +93,15 @@ export default function App() {
     setLoggedin(status);
   }, []);
 
+  return (
+    <Layout>
+      <Outlet />
+    </Layout>
+  );
+}
+
+export function Layout({ children }) {
+  const [navIsOpen, setNavIsOpen] = useState(false);
   function showMobileMenu() {
     const menu = document.getElementById("menu");
     menu.classList.toggle("hidden");
@@ -99,7 +109,6 @@ export default function App() {
     menu.classList.toggle("-translate-x-full");
     navIsOpen ? setNavIsOpen(false) : setNavIsOpen(true);
   }
-
   return (
     <html lang="en">
       <head>
@@ -114,20 +123,16 @@ export default function App() {
           <MenuItem icon={<Home />} label="Home" to="/" />
           <MenuItem icon={<Posts />} label="Job posts" to="/job-posts" />
           <MenuItem icon={<Candidates />} label="Candidates" to="/candidates" />
-          {loggedin && (
-            <MenuItem icon={<Profile />} label="Profile" to="/profile" />
-          )}
+
+          <MenuItem icon={<Profile />} label="Profile" to="/profile" />
 
           <MenuItem icon={<Tools />} label="Tools" to="/tools" />
 
-          {!loggedin && (
-            <MenuItem icon={<Plus />} label="Create User" to="/create-user" />
-          )}
-          {!loggedin ? (
-            <MenuItem icon={<LogIn />} label="Log In" to="/login" />
-          ) : (
-            <MenuItem icon={<LogOut />} label="Log Out" to="/logout" />
-          )}
+          <MenuItem icon={<Plus />} label="Create User" to="/create-user" />
+
+          <MenuItem icon={<LogIn />} label="Log In" to="/login" />
+
+          <MenuItem icon={<LogOut />} label="Log Out" to="/logout" />
         </aside>
         <div className="md:hidden flex justify-center py-1 px-2">
           <div className=" absolute left-0 px-1">
@@ -139,9 +144,7 @@ export default function App() {
           <Logo className="h-auto w-20" />
         </div>
 
-        <main className="flex-1 px-4 py-7 ml-14">
-          <Outlet />
-        </main>
+        <main className="flex-1 px-4 py-7 ml-14">{children}</main>
 
         <ScrollRestoration />
         <Scripts />
@@ -150,6 +153,42 @@ export default function App() {
     </html>
   );
 }
+
+export function CatchBoundary() {
+  const caught = useCatch();
+  return (
+    <Layout>
+      <main className=" flex justify-center items-center col-span-5 flex-col ">
+        <h1 className=" text-5xl font-bold">{caught.statusText}</h1>
+        <Link
+          className="text-white flex items-center h-fit  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mt-4"
+          to="/"
+        >
+          Go to the home page
+        </Link>
+      </main>
+    </Layout>
+  );
+}
+
+export function ErrorBoundary({ error }) {
+  return (
+    <Layout>
+      <main className=" flex justify-center items-center col-span-5 flex-col ">
+        <h1 className="text-red-500 font-bold">
+          {error.name}: {error.message}
+        </h1>
+        <Link
+          className="text-white flex items-center h-fit  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mt-4"
+          to="/"
+        >
+          Go to the home page
+        </Link>
+      </main>
+    </Layout>
+  );
+}
 //TODO add catch and ERROR boundry to everything
 //TODO add a 404 page
 //TODO make it work on mobile
+// TODO: find a way to check if the user is logged in for the Navbar
