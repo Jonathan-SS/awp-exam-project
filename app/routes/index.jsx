@@ -62,3 +62,4 @@ export default function Index() {
 
 //TODO: add pagination to the posts
 //TODO: add show more to posts
+//TODO: set up messaging system

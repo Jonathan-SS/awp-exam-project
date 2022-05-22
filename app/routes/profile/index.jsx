@@ -11,6 +11,7 @@ import { useRef, useEffect } from "react";
 import Markdown from "markdown-to-jsx";
 import Close from "../../icons/Close";
 import { json } from "@remix-run/node";
+import ReactTooltip from "react-tooltip";
 
 //TODO add option to change image and add one
 export async function loader({ request, params }) {
@@ -187,8 +188,17 @@ export default function Profile() {
               id=""
               cols="20"
               rows="3"
-              placeholder="Share your thoughts, a cool project, or a cool idea. (psst...you can use markdown formatting)"
+              placeholder="Share your thoughts, a cool project, or a cool idea. "
             ></textarea>
+            <p
+              data-tip="(Headings: # ## ###) (Image:
+              ![alt-text](Link)) (link: [title](Link)) "
+              className="text-sm text-slate-400 -mt-2 px-2"
+            >
+              Psst...you can use <u>MarkDown formatting.</u>
+            </p>
+            <ReactTooltip place="bottom" type="info" effect="solid" />
+
             <input
               type="hidden"
               name="userName"

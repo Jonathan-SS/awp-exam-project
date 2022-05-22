@@ -25,6 +25,7 @@ import Posts from "./icons/Posts";
 import Profile from "./icons/Profile";
 import Tools from "./icons/Tools";
 import LogOut from "./icons/LogOut";
+import Chat from "./icons/Chat";
 import { getSession } from "./sessions.server";
 import { Link } from "react-router-dom";
 import Bug from "./illustrations/Bug";
@@ -126,7 +127,10 @@ export function Layout({ children, ...rest }) {
           <MenuItem icon={<Posts />} label="Job posts" to="/job-posts" />
           <MenuItem icon={<Candidates />} label="Candidates" to="/candidates" />
           {loggedin ? (
-            <MenuItem icon={<Profile />} label="Profile" to="/profile" />
+            <>
+              <MenuItem icon={<Profile />} label="Profile" to="/profile" />
+              <MenuItem icon={<Chat />} label="Chat" to="/chat" />
+            </>
           ) : null}
 
           <MenuItem icon={<Tools />} label="Tools" to="/tools" />
