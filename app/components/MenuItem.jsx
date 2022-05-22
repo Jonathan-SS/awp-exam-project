@@ -31,7 +31,7 @@ export default function MenuItem({ icon, label, to }) {
       <div className="relative">
         <div
           id={`${label}-ToolTip`}
-          className=" whitespace-nowrap line w-fit md:hidden absolute left-9 -bottom-1 bg-white rounded-full px-3 py-1 "
+          className=" whitespace-nowrap line w-fit md:hidden absolute left-9 -bottom-1 bg-white rounded-full px-3 py-1 z-50"
         >
           {label}
         </div>

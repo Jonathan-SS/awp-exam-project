@@ -50,9 +50,28 @@ const candiateSchema = new Schema(
     linksAsText: {
       type: String,
     },
+    posts: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Post",
+        },
+      ],
+    },
   },
   { timestamps: true }
 );
+
+const postsSchema = new Schema(
+  {
+    body: {
+      type: String,
+      minLength: [10, "That's too short for at post"],
+    },
+  },
+  { timestamps: true }
+);
+
 const recruiterSchema = new Schema(
   {
     company: {
@@ -103,5 +122,10 @@ export const models = [
     name: "Recruiter",
     schema: recruiterSchema,
     collection: "recruiters",
+  },
+  {
+    name: "Post",
+    schema: postsSchema,
+    collection: "posts",
   },
 ];

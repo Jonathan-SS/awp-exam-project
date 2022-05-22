@@ -120,7 +120,7 @@ export function Layout({ children, ...rest }) {
       <body className="bg-slate-100 text-slate-800 font-sans md:flex">
         <aside
           id="menu"
-          className=" absolute md:fixed -translate-x-full hidden md:translate-x-0 md:flex flex-col h-100vh px-1 md:px-3 py-8 gap-6 "
+          className=" z-50 absolute md:fixed -translate-x-full hidden md:translate-x-0 md:flex flex-col h-100vh px-1 md:px-3 py-8 gap-6 "
         >
           <MenuItem icon={<Home />} label="Home" to="/" />
           <MenuItem icon={<Posts />} label="Job posts" to="/job-posts" />
@@ -150,7 +150,7 @@ export function Layout({ children, ...rest }) {
           <Logo className="h-auto w-20" />
         </div>
 
-        <main className="flex-1 px-4 py-7 ml-14">{children}</main>
+        <main className="flex-1 px-4 py-7 ml-14 z-20">{children}</main>
 
         <ScrollRestoration />
         <Scripts />

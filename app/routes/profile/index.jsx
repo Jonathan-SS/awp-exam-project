@@ -1,23 +1,34 @@
-import { Form, useLoaderData, useSubmit } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useTransition,
+} from "@remix-run/react";
 import { Link } from "react-router-dom";
 import connectDb from "~/db/connectDb.server";
 import { getSession, requireSession } from "../../sessions.server";
+import { useRef, useEffect } from "react";
 import Markdown from "markdown-to-jsx";
-import Plus from "../../icons/Plus";
-import useJs from "../../hooks/useJs";
+import Close from "../../icons/Close";
+import { json } from "@remix-run/node";
 
 //TODO add option to change image and add one
 export async function loader({ request, params }) {
   await requireSession(request);
   const db = await connectDb();
   const cookie = request.headers.get("Cookie");
-
   const session = await getSession(cookie);
   const userId = session.get("userId");
-  console.log(userId);
   const user = await db.models.Candidate.findById(userId);
-  console.log(user);
-  return user;
+  const posts = [];
+  const postIds = user.get("posts");
+
+  for (let i = 0; i < postIds.length; i++) {
+    const post = await db.models.Post.findById(postIds[i]);
+    posts.push(post);
+  }
+
+  return { user, posts };
 }
 
 export const action = async ({ request }) => {
@@ -26,15 +37,59 @@ export const action = async ({ request }) => {
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);
   const userId = session.get("userId");
+  try {
+    if (form.get("_action") === "deletePost") {
+      const postId = form.get("postId");
+      await db.models.Post.deleteOne({ posts: postId });
+      await db.models.Candidate.updateOne(
+        { _id: userId },
+        { $pull: { posts: postId } }
+      );
+      return null;
+    }
+
+    const post = await db.models.Post.create({
+      body: form.get("body"),
+    });
+
+    await db.models.Candidate.updateOne(
+      {
+        _id: userId,
+      },
+      {
+        $addToSet: {
+          posts: post._id,
+        },
+      }
+    );
+    return null;
+  } catch (error) {
+    console.error(error);
+    return json(
+      { errors: error.errors, values: Object.fromEntries(form) },
+      { status: 400 }
+    );
+  }
 };
 
 export default function Profile() {
-  const user = useLoaderData();
-  const submit = useSubmit();
-  const hasJs = useJs();
+  const { user, posts } = useLoaderData();
+  const actionData = useActionData();
+
+  let transition = useTransition();
+  let isAdding =
+    transition.state === "submitting" &&
+    transition.submission.formData.get("_action") === "addPost";
+  let formRef = useRef();
+
+  useEffect(() => {
+    if (!isAdding) {
+      formRef.current?.reset();
+    }
+  }, [isAdding]);
 
   return (
-    <div className="flex gap-8">
+    <div className="flex gap-4">
       <div className=" h-full w-80 bg-white p-4 rounded-xl">
         <div className=" relative">
           <img
@@ -57,14 +112,14 @@ export default function Profile() {
             <p>
               {user?.description
                 ? user.description
-                : " Looks like you haven't added a description your profile. Go To Edit profile to add one."}
+                : " Looks like you haven't added a description to your profile. Go To Edit profile to add one."}
             </p>
           </div>
 
           <div>
             <h3 className=" font-semibold text-lg">Links</h3>
             <div>
-              {user?.links
+              {user.links.length > 0
                 ? user.links?.map((link) => (
                     <a
                       key={link.name}
@@ -75,14 +130,14 @@ export default function Profile() {
                       {link.name}
                     </a>
                   ))
-                : null}
+                : " Looks like you haven't added any links to your profile. Go To Edit profile to add some."}
             </div>
           </div>
 
           <div>
             <h3 className=" font-semibold text-lg">Tags</h3>
             <div className="flex gap-2">
-              {user?.tags.length > 0
+              {user.tags.length > 0
                 ? user.tags?.map((tag) => (
                     <p
                       key={tag}
@@ -105,46 +160,71 @@ export default function Profile() {
           </p>
         </div>
       </div>
-      <div className=" flex flex-col gap-8 flex-1">
+      <div className=" flex flex-col gap-4 flex-1">
         <div className=" flex-2 bg-white p-4 rounded-xl">
           <h2 className=" font-bold text-2xl mb-4">
             Share a Post on your profile
           </h2>
-          <Form method="post" className="flex gap-4 items-start flex-col">
+          <Form
+            ref={formRef}
+            method="post"
+            className="flex gap-4 items-start flex-col"
+          >
+            {actionData ? (
+              <p className="text-red-500 px-4 -m-3 ">
+                {actionData.errors?.body.message}
+              </p>
+            ) : (
+              <p></p>
+            )}
             <textarea
               className=" w-full py-2 px-4 rounded-lg border border-gray-300"
-              name="post"
+              name="body"
               id=""
               cols="20"
               rows="3"
+              placeholder="Share your thoughts, a cool project, or a cool idea. (psst...you can use markdown formatting)"
             ></textarea>
             <button
               className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md"
               type="submit"
+              name="_action"
+              value="addPost"
+              disabled={transition.state === "submitting"}
             >
               Share
             </button>
           </Form>
         </div>
-        <div className=" flex-1 bg-white p-4 rounded-xl">
-          <div className="rounded-lg border border-slate-300 p-4 relative">
-            <Form method="post" className=" absolute right-0">
-              <button>Delete post</button>
-            </Form>
-            <div>
-              <Markdown># Heck Yes\n\nThis is great!</Markdown>
-              <h3 className=" font-bold text-xl mb-4">This is a post</h3>
-              <p>This is the text of the post</p>
+        {posts.map((post) => (
+          <div key={post._id} className="bg-white p-4 rounded-xl">
+            <div className="rounded-lg border border-slate-300 p-4 relative">
+              <div
+                className=" h1:text-2xl h1:font-bold h2:text-xl h2:font-semibold h3:text-lg h3:font-semibold h4:text-md h4:font-semibold img:max-h-64 img:shadow-md img:rounded-lg "
+                id="markdownStyle"
+              >
+                <Markdown>{post.body}</Markdown>
+              </div>
+              <Form method="post" className=" right-0 top-0 absolute p-2">
+                <input type="hidden" name="postId" value={post._id} />
+                <button
+                  type="submit"
+                  name="_action"
+                  value="deletePost"
+                  disabled={transition.state === "submitting"}
+                  className="p-1 bg-red-500 rounded-full shadow-lg hover:shadow-md"
+                >
+                  <Close className="h-4 w-4" color="white" />
+                </button>
+              </Form>
             </div>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );
 }
 
-//TODO set up ability to add a post to profile and delete it
-//TODO set up way to use markdown to add a post
+//TODOone set up ability to add a post to profile and delete it
+//TODOone set up way to use markdown to add a post
 //TODO add a profile page for recruiters where they can post jobs
-
-//TODO setup a

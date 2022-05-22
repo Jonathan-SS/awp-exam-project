@@ -1,11 +1,14 @@
-export default function Close() {
+export default function Close({
+  color = "currentColor",
+  className = "h-6 w-6",
+}) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-6 w-6"
+      xmlnsXlink="http://www.w3.org/2000/svg"
+      className={className}
       fill="none"
       viewBox="0 0 24 24"
-      stroke="currentColor"
+      stroke={color}
       strokeWidth={2}
     >
       <path

@@ -180,4 +180,5 @@ export default function Candidates() {
     </div>
   );
 }
-// add a way to show all tags from every user
+// TODO: add a way to show all tags from every user
+// TODO: fix the bios of the users

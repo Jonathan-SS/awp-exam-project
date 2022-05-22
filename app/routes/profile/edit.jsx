@@ -42,22 +42,17 @@ export async function action({ request }) {
     request,
     fileUploadHandler
   );
-  if (formData.get("_actionAfterSubmit") === "deleteAccount") {
-    console.log("delete account");
-  }
 
-  console.log(formData.get("image")); // will return the filename
   const image = formData.get("image");
   if (image) {
     const imageUpload = await db.models.Candidate.findByIdAndUpdate(userId, {
       image: image,
     });
     console.log(imageUpload.image);
-    console.log("herover");
   }
 
   const form = await request.formData();
-  const firstname = formData.get("firstname").trim();
+  const firstname = formData.get("firstname");
   const lastname = formData.get("lastname");
   const email = formData.get("email");
   const description = formData.get("description");
@@ -65,7 +60,7 @@ export async function action({ request }) {
   const linksText = formData.get("links");
   const links = formData.get("links")?.split("\n");
   const seperatedLinks = [];
-  links.forEach((link) => {
+  links?.forEach((link) => {
     const colon = link.split(";");
     seperatedLinks.push({
       name: colon[0],
@@ -136,7 +131,8 @@ export default function Candidate() {
       <Logo />
       <div className="text-center mt-4 flex flex-col gap-4 ">
         <h1 className=" text-4xl font-bold mb-4 ">
-          Great! <br /> Now it's time to sign up!
+          Time to add some more information
+          <br /> to your profile?
         </h1>
       </div>
 
@@ -147,7 +143,7 @@ export default function Candidate() {
         onChange={handleChange}
         reloadDocument
       >
-        <div className=" relative">
+        <div className=" relative mb-4">
           <img
             src={
               user.image
@@ -160,8 +156,8 @@ export default function Candidate() {
           />
 
           <label
-            for="file-upload"
-            className="rounded-full p-4 hover:shadow-md w-fit bg-white shadow-lg hover:cursor-pointer"
+            htmlfor="file-upload"
+            className=" block absolute bottom-2 right-20 rounded-full p-4 hover:shadow-md w-fit bg-white shadow-lg hover:cursor-pointer"
           >
             <Plus />
           </label>
