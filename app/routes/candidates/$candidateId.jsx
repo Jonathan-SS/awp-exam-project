@@ -2,26 +2,37 @@ import { Form, useLoaderData } from "@remix-run/react";
 import { Link } from "react-router-dom";
 import connectDb from "~/db/connectDb.server";
 import { getSession } from "../../sessions.server";
+import Markdown from "markdown-to-jsx";
 
 export async function loader({ request, params }) {
   const db = await connectDb();
   const userId = params.candidateId;
-
   const user = await db.models.Candidate.findById(userId);
-  console.log(user);
-  return user;
+  const posts = [];
+  const postIds = user.get("posts");
+  for (let i = 0; i < postIds.length; i++) {
+    const post = await db.models.Post.findById(postIds[i]);
+    posts.push(post);
+  }
+
+  return { user, posts };
 }
 
 export default function Profile() {
-  const user = useLoaderData();
+  const { user, posts } = useLoaderData();
   console.log(user);
   return (
-    <div className="flex gap-8">
+    <div className="flex gap-4">
       <div className=" h-full w-80 bg-white p-4 rounded-xl">
         <div className="">
           <img
-            src="/403017_avatar_default_head_person_unknown_icon.png"
+            src={
+              user?.image
+                ? `/uploads/${user.image.name}`
+                : "/403017_avatar_default_head_person_unknown_icon.png"
+            }
             alt=""
+            className="w-64 h-64 m-auto rounded-full content object-cover bg-white"
           />
         </div>
 
@@ -79,14 +90,28 @@ export default function Profile() {
         </div>
       </div>
       <div className=" flex flex-col gap-8 flex-1">
-        <div className=" bg-white p-4 rounded-xl">
-          <div className="rounded-lg border border-slate-300 p-4 relative">
-            <div>
-              <h3 className=" font-bold text-xl mb-4">This is a post</h3>
-              <p>This is the text of the post</p>
+        {posts.map((post) => (
+          <div key={post._id} className="bg-white p-6 rounded-xl shadow-lg">
+            <div className="rounded-lg  relative">
+              <div
+                className=" h1:text-2xl h1:font-bold h1:mb-4 h2:mb-2 h2:text-xl h2:font-semibold h3:text-lg h3:font-semibold h4:text-md h4:font-semibold img:max-h-64 img:shadow-md img:rounded-lg img:mb-2"
+                id="markdownStyle"
+              >
+                <Markdown>{post.body}</Markdown>
+                <Link to={`/candidates/${post.user.userId}`}>
+                  <p className="text-slate-400">{`Candidate: ${post.user.userName}`}</p>
+                </Link>
+
+                <p className="text-slate-400">
+                  {"Posted: " +
+                    post.createdAt.slice(8, 10) +
+                    post.createdAt.slice(4, 8) +
+                    post.createdAt.slice(0, 4)}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );

@@ -50,6 +50,10 @@ export const action = async ({ request }) => {
 
     const post = await db.models.Post.create({
       body: form.get("body"),
+      user: {
+        userId: userId,
+        userName: form.get("userName"),
+      },
     });
 
     await db.models.Candidate.updateOne(
@@ -90,7 +94,7 @@ export default function Profile() {
 
   return (
     <div className="flex gap-4">
-      <div className=" h-full w-80 bg-white p-4 rounded-xl">
+      <div className=" h-full w-80 bg-white p-4 rounded-xl shadow-md">
         <div className=" relative">
           <img
             src={
@@ -99,7 +103,7 @@ export default function Profile() {
                 : "/403017_avatar_default_head_person_unknown_icon.png"
             }
             alt=""
-            className=" w-64 h-64 m-auto rounded-full content object-cover bg-white  "
+            className=" w-64 h-64 m-auto rounded-full content object-cover bg-white "
           />
         </div>
 
@@ -161,7 +165,7 @@ export default function Profile() {
         </div>
       </div>
       <div className=" flex flex-col gap-4 flex-1">
-        <div className=" flex-2 bg-white p-4 rounded-xl">
+        <div className=" flex-2 bg-white p-4 rounded-xl shadow-md">
           <h2 className=" font-bold text-2xl mb-4">
             Share a Post on your profile
           </h2>
@@ -185,6 +189,11 @@ export default function Profile() {
               rows="3"
               placeholder="Share your thoughts, a cool project, or a cool idea. (psst...you can use markdown formatting)"
             ></textarea>
+            <input
+              type="hidden"
+              name="userName"
+              value={`${user.firstname} ${user.lastname}`}
+            />
             <button
               className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md"
               type="submit"
@@ -197,15 +206,27 @@ export default function Profile() {
           </Form>
         </div>
         {posts.map((post) => (
-          <div key={post._id} className="bg-white p-4 rounded-xl">
-            <div className="rounded-lg border border-slate-300 p-4 relative">
+          <div key={post._id} className="bg-white p-6 rounded-xl shadow-lg">
+            <div className="rounded-lg relative">
               <div
-                className=" h1:text-2xl h1:font-bold h2:text-xl h2:font-semibold h3:text-lg h3:font-semibold h4:text-md h4:font-semibold img:max-h-64 img:shadow-md img:rounded-lg "
+                className="  h1:text-2xl h1:font-bold h1:mb-4 h2:mb-2 h2:text-xl h2:font-semibold h3:text-lg h3:font-semibold h4:text-md h4:font-semibold img:max-h-64 img:shadow-md img:rounded-lg img:mb-2"
                 id="markdownStyle"
               >
                 <Markdown>{post.body}</Markdown>
+                <Link to={`/candidates/${post.user.userId}`}>
+                  <p className="text-slate-400">{`Candidate: ${post.user.userName}`}</p>
+                </Link>
+
+                <p className="text-slate-400">
+                  {user
+                    ? "Posted: " +
+                      post.createdAt.slice(8, 10) +
+                      post.createdAt.slice(4, 8) +
+                      post.createdAt.slice(0, 4)
+                    : null}
+                </p>
               </div>
-              <Form method="post" className=" right-0 top-0 absolute p-2">
+              <Form method="post" className=" -right-4 -top-4 absolute p-2">
                 <input type="hidden" name="postId" value={post._id} />
                 <button
                   type="submit"

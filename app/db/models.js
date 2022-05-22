@@ -68,6 +68,15 @@ const postsSchema = new Schema(
       type: String,
       minLength: [10, "That's too short for at post"],
     },
+    user: {
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: "Candidate",
+      },
+      userName: {
+        type: String,
+      },
+    },
   },
   { timestamps: true }
 );

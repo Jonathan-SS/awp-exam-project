@@ -141,7 +141,11 @@ export default function Candidates() {
             <Link to={`/candidates/${candidate._id}`} className="z-10">
               <div className="flex">
                 <img
-                  src="/403017_avatar_default_head_person_unknown_icon.png"
+                  src={
+                    candidate?.image
+                      ? `/uploads/${candidate.image.name}`
+                      : "/403017_avatar_default_head_person_unknown_icon.png"
+                  }
                   alt=""
                   className="w-24 h-24 rounded-full mr-4"
                 />
