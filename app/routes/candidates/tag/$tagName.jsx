@@ -15,7 +15,7 @@ export async function loader({ params, request }) {
   console.log(name);
 
   return {
-    candidates: await db.models.Candidate.find(
+    candidates: await db.models.User.find(
       name
         ? {
             $or: [
@@ -23,12 +23,14 @@ export async function loader({ params, request }) {
                 $and: [
                   { firstname: { $regex: new RegExp(name, "i") } },
                   { tags: tag },
+                  { userType: "candidate" },
                 ],
               },
               {
                 $and: [
                   { lastname: { $regex: new RegExp(name, "i") } },
                   { tags: tag },
+                  { userType: "candidate" },
                 ],
               },
             ],

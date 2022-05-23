@@ -14,7 +14,7 @@ export async function action({ request }) {
   const email = form.get("email");
 
   try {
-    const user = await db.models.Candidate.findOne({ email: email });
+    const user = await db.models.User.findOne({ email: email });
 
     if (!user) {
       return json(

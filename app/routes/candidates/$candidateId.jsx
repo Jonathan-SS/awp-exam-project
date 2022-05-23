@@ -7,7 +7,7 @@ import Markdown from "markdown-to-jsx";
 export async function loader({ request, params }) {
   const db = await connectDb();
   const userId = params.candidateId;
-  const user = await db.models.Candidate.findById(userId);
+  const user = await db.models.User.findById(userId);
   const posts = [];
   const postIds = user.get("posts");
   for (let i = 0; i < postIds.length; i++) {

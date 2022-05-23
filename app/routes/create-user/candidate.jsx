@@ -29,11 +29,12 @@ export async function action({ request }) {
     const password = await bcrypt.hash(form.get("Password"), 10);
     console.log(password);
 
-    const user = await db.models.Candidate.create({
+    const user = await db.models.User.create({
       firstname,
       email,
       lastname,
       password,
+      userType: "candidate",
     });
     console.log(user);
     const session = await getSession(request.headers.get("Cookie"));

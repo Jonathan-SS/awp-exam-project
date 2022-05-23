@@ -16,7 +16,7 @@ export async function loader({ params, request }) {
 
   if (tag) {
     return {
-      candidates: await db.models.Candidate.find(
+      candidates: await db.models.User.find(
         name
           ? {
               $or: [
@@ -24,12 +24,14 @@ export async function loader({ params, request }) {
                   $and: [
                     { firstname: { $regex: new RegExp(name, "i") } },
                     { tags: tag },
+                    { userType: "candidate" },
                   ],
                 },
                 {
                   $and: [
                     { lastname: { $regex: new RegExp(name, "i") } },
                     { tags: tag },
+                    { userType: "candidate" },
                   ],
                 },
               ],
@@ -43,15 +45,21 @@ export async function loader({ params, request }) {
   }
 
   return {
-    candidates: await db.models.Candidate.find(
+    candidates: await db.models.User.find(
       name
         ? {
             $or: [
               {
-                $and: [{ firstname: { $regex: new RegExp(name, "i") } }],
+                $and: [
+                  { firstname: { $regex: new RegExp(name, "i") } },
+                  { userType: "candidate" },
+                ],
               },
               {
-                $and: [{ lastname: { $regex: new RegExp(name, "i") } }],
+                $and: [
+                  { lastname: { $regex: new RegExp(name, "i") } },
+                  { userType: "candidate" },
+                ],
               },
             ],
           }

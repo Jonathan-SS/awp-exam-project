@@ -9,7 +9,7 @@ export async function loader({ request }) {
   const session = await getSession(cookie);
   const userId = session.get("userId");
   console.log(userId);
-  const user = await db.models.Candidate.deleteOne({ _id: userId });
+  const user = await db.models.User.deleteOne({ _id: userId });
   return redirect("/", {
     headers: {
       "Set-Cookie": await destroySession(session),

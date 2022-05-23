@@ -33,12 +33,13 @@ export async function action({ request }) {
     const password = await bcrypt.hash(form.get("Password"), 10);
     console.log(password);
 
-    const user = await db.models.Recruiter.create({
+    const user = await db.models.User.create({
       company,
       firstname,
       email,
       lastname,
       password,
+      userType: "recruiter",
     });
     console.log(user);
     const session = await getSession(request.headers.get("Cookie"));

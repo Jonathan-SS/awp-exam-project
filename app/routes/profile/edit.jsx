@@ -21,7 +21,7 @@ export async function loader({ request }) {
   const session = await getSession(cookie);
   const userId = session.get("userId");
   console.log(userId);
-  const user = await db.models.Candidate.findById(userId);
+  const user = await db.models.User.findById(userId);
   console.log(user);
   return user;
 }
@@ -45,7 +45,7 @@ export async function action({ request }) {
 
   const image = formData.get("image");
   if (image) {
-    const imageUpload = await db.models.Candidate.findByIdAndUpdate(userId, {
+    const imageUpload = await db.models.User.findByIdAndUpdate(userId, {
       image: image,
     });
     console.log(imageUpload.image);
@@ -84,7 +84,7 @@ export async function action({ request }) {
     };
     const password = await passwordCheck();
 
-    await db.models.Candidate.updateOne(
+    await db.models.User.updateOne(
       { _id: userId },
       {
         firstname,
@@ -155,12 +155,16 @@ export default function Candidate() {
             className=" w-64 h-64 m-auto rounded-full content object-cover bg-white  "
           />
 
-          <label
-            htmlfor="file-upload"
+          <button
+            type="button"
+            onClick={() => {
+              document.getElementById("file-upload").click();
+            }}
+            htmlFor="file-upload"
             className=" block absolute bottom-2 right-20 rounded-full p-4 hover:shadow-md w-fit bg-white shadow-lg hover:cursor-pointer"
           >
             <Plus />
-          </label>
+          </button>
 
           <input id="file-upload" type="file" name="image" className="hidden" />
         </div>
@@ -270,3 +274,4 @@ export default function Candidate() {
 }
 
 //TODO: move buttons and links in to a seperate component, so they can be reused in the forms
+//TODO: make a tooltip self, code is actiong up

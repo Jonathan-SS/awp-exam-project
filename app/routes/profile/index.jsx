@@ -20,7 +20,7 @@ export async function loader({ request, params }) {
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);
   const userId = session.get("userId");
-  const user = await db.models.Candidate.findById(userId);
+  const user = await db.models.User.findById(userId);
   const posts = [];
   const postIds = user.get("posts");
 
@@ -42,7 +42,7 @@ export const action = async ({ request }) => {
     if (form.get("_action") === "deletePost") {
       const postId = form.get("postId");
       await db.models.Post.deleteOne({ posts: postId });
-      await db.models.Candidate.updateOne(
+      await db.models.User.updateOne(
         { _id: userId },
         { $pull: { posts: postId } }
       );
@@ -57,7 +57,7 @@ export const action = async ({ request }) => {
       },
     });
 
-    await db.models.Candidate.updateOne(
+    await db.models.User.updateOne(
       {
         _id: userId,
       },
@@ -80,6 +80,7 @@ export const action = async ({ request }) => {
 export default function Profile() {
   const { user, posts } = useLoaderData();
   const actionData = useActionData();
+  console.log(user.image);
 
   let transition = useTransition();
   let isAdding =

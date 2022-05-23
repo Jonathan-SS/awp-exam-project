@@ -16,12 +16,12 @@ export async function loader({ request, params }) {
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);
   const userId = session.get("userId");
-  const conversations = await db.models.Chat.find({
+  const chats = await db.models.Chat.find({
     participants: {
       $elemMatch: { userId },
     },
   });
-  return { userId, conversations };
+  return { userId, chats };
 }
 
 export async function action({ request }) {
@@ -30,15 +30,14 @@ export async function action({ request }) {
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);
   const userId = session.get("userId");
-  const conversationId = form.get("conversationId");
+  const chatId = form.get("chatId");
 
   if (form.get("_action") === "sendMessage") {
     const message = form.get("message");
+    console.log("besked: ", message);
 
-    await db.models.Chat.updateOne(
-      {
-        _id: conversationId,
-      },
+    const sendMessage = await db.models.Chat.updateOne(
+      { _id: chatId },
       {
         $push: {
           messages: {
@@ -47,25 +46,40 @@ export async function action({ request }) {
           },
         },
       }
+      // {
+      //   _id: chatId,
+      // },
+      // {
+      //   $push: {
+      //     messages: {
+      //       sender: userId,
+      //       message,
+      //     },
+      //   },
+      // }
     );
+    console.log(sendMessage);
   }
 
   let chat = await db.models.Chat.findOne({
-    _id: conversationId,
+    _id: chatId,
   });
-  if (!conversationId) {
-    const user = await db.models.Candidate.findById(userId);
-    const participant = await db.models.Candidate.findById(
-      form.get("participant")
-    );
+
+  if (!chatId) {
+    const user = await db.models.User.findById(userId);
+    const participant = await db.models.User.findById(form.get("participant"));
 
     chat = await db.models.Chat.create({
       participants: [
         {
           userId: user._id,
+          name: `${user.firstname} ${user.lastname}`,
+          image: user.image.name,
         },
         {
           userId: participant._id,
+          name: `${participant.firstname} ${participant.lastname}`,
+          image: participant.image.name,
         },
       ],
       messages: [
@@ -75,24 +89,23 @@ export async function action({ request }) {
       ],
     });
   }
-  const messages = await db.models.Chat.findOne({
-    _id: conversationId,
-  }).select({ messages: 1 });
-  console.log(messages.messages);
 
-  return { chat, conversationId, messages: messages.messages };
+  const messages = chat.messages;
+
+  console.log("chat:", chat);
+  console.log("chatId", chatId);
+  console.log("messages", messages);
+  return { chat, chatId, messages: chat.messages };
 }
 
 export default function Chats() {
   let hasJs = useJs();
   let transition = useTransition();
-
   const actionData = useActionData();
   console.log(actionData?.chat);
-  const { userId, conversations } = useLoaderData();
-  let formRef = useRef();
-
-  useEffect(() => {}, [userId]);
+  const { chats, userId } = useLoaderData();
+  console.log(actionData?.messages);
+  console.log("den her");
 
   const buttonText =
     transition.state === "submitting" &&
@@ -121,25 +134,24 @@ export default function Chats() {
             </button>
           )}
         </Form>
-        <div className="max-h-screen overflow-y-scroll scrollbar:hidden">
-          {conversations
-            ? conversations.map((conversation) => (
+        <div className="max-h-screen scrollbar:hidden max-w-40">
+          {chats
+            ? chats.map((chat) => (
                 <Form
-                  key={conversation._id}
+                  key={chat._id}
                   method="post"
-                  to=""
                   className=" border-b py-2 w-full"
                 >
                   <button
                     className="flex"
                     type="submit"
-                    name="conversationId"
-                    value={conversation._id}
+                    name="chatId"
+                    value={chat._id}
                   >
                     <input
                       type="hidden"
                       name="participant"
-                      value={conversation.participants[1]}
+                      value={chat.participants[1]._id}
                     />
                     <img
                       src="/403017_avatar_default_head_person_unknown_icon.png"
@@ -147,9 +159,14 @@ export default function Chats() {
                       className="w-12 h-12 rounded-full mr-2"
                     />
                     <div className=" text-left">
-                      <h3 className=" text-xl font-semibold">Name</h3>
-                      <p className=" text-slate-400 text-xs">
-                        {conversation.latestMessage}
+                      <h3 className=" text-xl font-semibold">
+                        {chat.participants[1].name}
+                      </h3>
+                      <p className=" text-slate-400 text-xs max-w-1/2 truncate">
+                        {chat.messages[chat.messages.length - 1].message.slice(
+                          0,
+                          25
+                        ) + "..."}
                       </p>
                     </div>
                   </button>
@@ -162,8 +179,8 @@ export default function Chats() {
         <h2 className=" text-lg font-medium">Chat with name</h2>
         <div className=" ">
           <div className=" py-4 px-2 max-h-screen overflow-y-scroll  flex flex-col gap-4 justify-end">
-            {actionData?.chat.messages.length > 0 ? (
-              actionData.chat.messages.map((message) => (
+            {actionData?.messages.length > 0 ? (
+              actionData.messages.map((message) => (
                 <div
                   key={message._id}
                   className={
@@ -175,8 +192,8 @@ export default function Chats() {
                 >
                   <img
                     src={
-                      actionData?.conversation
-                        ? `/uploads/${actionData.conversation.participants[1].image}`
+                      actionData?.chat
+                        ? `/uploads/${actionData.chat.participants[1].image}`
                         : "/403017_avatar_default_head_person_unknown_icon.png"
                     }
                     alt=""
@@ -243,3 +260,4 @@ export default function Chats() {
 // TODO fix overflow of messages with no scroll
 
 // TODO next, fix whole chat logic to new schema
+// TODO fix this bug

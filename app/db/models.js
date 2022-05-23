@@ -2,7 +2,7 @@ import { mongoose } from "mongoose";
 
 const { Schema } = mongoose;
 
-const candiateSchema = new Schema(
+const userSchema = new Schema(
   {
     firstname: {
       type: String,
@@ -13,6 +13,13 @@ const candiateSchema = new Schema(
       type: String,
       required: [true, "Last Name is required"],
       minLength: [3, "That's too short"],
+    },
+    comapny: {
+      type: String,
+    },
+    userType: {
+      type: String,
+      required: true,
     },
     email: {
       type: String,
@@ -32,8 +39,7 @@ const candiateSchema = new Schema(
       minLength: [10, "That's too short"],
     },
     image: {
-      data: Buffer,
-      contentType: String,
+      type: Object,
     },
     links: {
       type: [
@@ -68,54 +74,17 @@ const postsSchema = new Schema(
       type: String,
       minLength: [10, "That's too short for at post"],
     },
+    postType: {
+      type: String,
+    },
     user: {
       userId: {
         type: Schema.Types.ObjectId,
-        ref: "Candidate",
+        ref: "User",
       },
       userName: {
         type: String,
       },
-    },
-  },
-  { timestamps: true }
-);
-
-const recruiterSchema = new Schema(
-  {
-    company: {
-      type: String,
-      required: [true, "Company is required"],
-      minLength: [3, "That's too short"],
-    },
-    firstname: {
-      type: String,
-      required: [true, "First Name is required"],
-      minLength: [3, "That's too short"],
-    },
-    lastname: {
-      type: String,
-      required: [true, "Last Name is required"],
-      minLength: [3, "That's too short"],
-    },
-    email: {
-      type: String,
-      required: [true, "Email is required"],
-      unique: true,
-    },
-    password: {
-      type: String,
-      required: true,
-      minLength: [6, "That's too short"],
-    },
-
-    image: {
-      type: String,
-      required: true,
-    },
-    links: {
-      type: [String],
-      required: true,
     },
   },
   { timestamps: true }
@@ -126,13 +95,27 @@ const chatSchema = new Schema({
     {
       userId: {
         type: Schema.Types.ObjectId,
-        ref: "Candidate",
+        ref: "User",
+      },
+      name: {
+        type: String,
+        required: true,
+      },
+      image: {
+        type: String,
       },
     },
     {
       userId: {
         type: Schema.Types.ObjectId,
-        ref: "Candidate",
+        ref: "User",
+      },
+      name: {
+        type: String,
+        required: true,
+      },
+      imageLink: {
+        type: String,
       },
     },
   ],
@@ -140,7 +123,7 @@ const chatSchema = new Schema({
     {
       sender: {
         type: Schema.Types.ObjectId,
-        ref: "Candidate",
+        ref: "USer",
       },
       message: {
         type: String,
@@ -158,14 +141,9 @@ const chatSchema = new Schema({
 
 export const models = [
   {
-    name: "Candidate",
-    schema: candiateSchema,
-    collection: "candidates",
-  },
-  {
-    name: "Recruiter",
-    schema: recruiterSchema,
-    collection: "recruiters",
+    name: "User",
+    schema: userSchema,
+    collection: "Users",
   },
   {
     name: "Post",
