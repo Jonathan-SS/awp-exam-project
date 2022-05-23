@@ -121,41 +121,40 @@ const recruiterSchema = new Schema(
   { timestamps: true }
 );
 
-const conversationSchema = new Schema({
-  latestMessage: {
-    type: String,
-    required: true,
-  },
+const chatSchema = new Schema({
   participants: [
     {
-      type: Schema.Types.ObjectId,
-      ref: "Candidate",
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: "Candidate",
+      },
     },
     {
-      type: Schema.Types.ObjectId,
-      ref: "Recruiter",
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: "Candidate",
+      },
+    },
+  ],
+  messages: [
+    {
+      sender: {
+        type: Schema.Types.ObjectId,
+        ref: "Candidate",
+      },
+      message: {
+        type: String,
+        required: true,
+      },
+      date: {
+        type: Date,
+        default: Date.now,
+      },
     },
   ],
 });
 
-const messageSchema = new Schema(
-  {
-    conversation: {
-      type: Schema.Types.ObjectId,
-      ref: "Conversation",
-    },
-    sender: {
-      type: Schema.Types.ObjectId,
-      ref: "Candidate",
-      required: true,
-    },
-    message: {
-      type: String,
-      required: true,
-    },
-  },
-  { timestamps: true }
-);
+//TODO: nake only one schema for all users
 
 export const models = [
   {
@@ -174,13 +173,8 @@ export const models = [
     collection: "posts",
   },
   {
-    name: "Conversation",
-    schema: conversationSchema,
-    collection: "conversations",
-  },
-  {
-    name: "Message",
-    schema: messageSchema,
-    collection: "messages",
+    name: "Chat",
+    schema: chatSchema,
+    collection: "chats",
   },
 ];

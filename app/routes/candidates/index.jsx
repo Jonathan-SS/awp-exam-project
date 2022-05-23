@@ -157,18 +157,13 @@ export default function Candidates() {
                   </h2>
                 </Link>
                 <Form method="post" action="/chat?index">
-                  <button
-                    className="flex"
-                    type="submit"
-                    name="conversationId"
-                    value="123456789098765432123456"
-                  >
+                  <button className="flex" type="submit">
                     Chat
                   </button>
                   <input
                     type="hidden"
                     name="participant"
-                    value="123456789098765432123456"
+                    value={candidate._id}
                   />
                 </Form>
 
