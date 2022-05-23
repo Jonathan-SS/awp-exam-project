@@ -121,6 +121,42 @@ const recruiterSchema = new Schema(
   { timestamps: true }
 );
 
+const conversationSchema = new Schema({
+  latestMessage: {
+    type: String,
+    required: true,
+  },
+  participants: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Candidate",
+    },
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Recruiter",
+    },
+  ],
+});
+
+const messageSchema = new Schema(
+  {
+    conversation: {
+      type: Schema.Types.ObjectId,
+      ref: "Conversation",
+    },
+    sender: {
+      type: Schema.Types.ObjectId,
+      ref: "Candidate",
+      required: true,
+    },
+    message: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
+
 export const models = [
   {
     name: "Candidate",
@@ -136,5 +172,15 @@ export const models = [
     name: "Post",
     schema: postsSchema,
     collection: "posts",
+  },
+  {
+    name: "Conversation",
+    schema: conversationSchema,
+    collection: "conversations",
+  },
+  {
+    name: "Message",
+    schema: messageSchema,
+    collection: "messages",
   },
 ];

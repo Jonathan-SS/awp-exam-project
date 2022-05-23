@@ -1,12 +1,11 @@
+const plugin = require("tailwindcss/plugin");
+
 module.exports = {
   content: ["./app/**/*.{jsx,tsx}"],
   theme: {
     extend: {
       height: {
         "100vh": "100vh",
-      },
-      "max-height": {
-        calc: "calc(100vh - 64px)",
       },
     },
     plugins: [
@@ -16,8 +15,9 @@ module.exports = {
         addVariant("h3", "& h3");
         addVariant("p", "& p");
         addVariant("img", "& img");
-        addVariant("tool-tip", "& :hover .tooltiptext");
       },
     ],
   },
 };
+
+//TODO: find a way to hide scrollbars on the chat page

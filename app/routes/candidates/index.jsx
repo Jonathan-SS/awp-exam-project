@@ -138,8 +138,8 @@ export default function Candidates() {
             key={candidate._id}
             className="w-72 bg-white p-4 rounded-xl grow min-w-xs max-w-xs "
           >
-            <Link to={`/candidates/${candidate._id}`} className="z-10">
-              <div className="flex">
+            <div className="flex">
+              <Link to={`/candidates/${candidate._id}`} className="z-10">
                 <img
                   src={
                     candidate?.image
@@ -149,35 +149,54 @@ export default function Candidates() {
                   alt=""
                   className="w-24 h-24 rounded-full mr-4"
                 />
-                <div>
+              </Link>
+              <div>
+                <Link to={`/candidates/${candidate._id}`} className="z-10">
                   <h2 className="text-xl font-semibold">
                     {`${candidate.firstname} ${candidate.lastname}`}
                   </h2>
-                  <div className="flex gap-2 flex-wrap">
-                    {candidate.tags?.map((tag) => (
+                </Link>
+                <Form method="post" action="/chat?index">
+                  <button
+                    className="flex"
+                    type="submit"
+                    name="conversationId"
+                    value="123456789098765432123456"
+                  >
+                    Chat
+                  </button>
+                  <input
+                    type="hidden"
+                    name="participant"
+                    value="123456789098765432123456"
+                  />
+                </Form>
+
+                <ul className="flex gap-2 flex-wrap">
+                  {candidate.tags?.map((tag) => (
+                    <li key={tag}>
                       <Link
-                        key={tag}
                         to={`/candidates/tag/${tag}`}
                         className=" bg-green-400 rounded-full px-2 hover:bg-green-300 z-20"
                       >
                         {tag}
                       </Link>
-                    ))}
-                  </div>
-                </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
+            </div>
 
-              <div className="pt-2 flex flex-col gap-2">
-                <p>{candidate.description}</p>
-                <div className="flex gap-2"></div>
-                <p className=" text-slate-400 text-sm">
-                  {"Created: " +
-                    candidate.createdAt.slice(8, 10) +
-                    candidate.createdAt.slice(4, 8) +
-                    candidate.createdAt.slice(0, 4)}
-                </p>
-              </div>
-            </Link>
+            <div className="pt-2 flex flex-col gap-2">
+              <p>{candidate.description}</p>
+              <div className="flex gap-2"></div>
+              <p className=" text-slate-400 text-sm">
+                {"Created: " +
+                  candidate.createdAt.slice(8, 10) +
+                  candidate.createdAt.slice(4, 8) +
+                  candidate.createdAt.slice(0, 4)}
+              </p>
+            </div>
           </li>
         ))}
       </ul>
