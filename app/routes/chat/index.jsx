@@ -1,5 +1,10 @@
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useTransition,
+} from "@remix-run/react";
+import { useEffect, useState, useRef } from "react";
 import { getSession, requireSession } from "../../sessions.server";
 import useJs from "../../hooks/useJs";
 import connectDb from "~/db/connectDb.server";
@@ -11,7 +16,7 @@ export async function loader({ request, params }) {
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);
   const userId = session.get("userId");
-  const conversations = await db.models.Conversation.find({
+  const conversations = await db.models.Chat.find({
     participants: {
       $elemMatch: { userId },
     },
@@ -29,23 +34,23 @@ export async function action({ request }) {
 
   if (form.get("_action") === "sendMessage") {
     const message = form.get("message");
-    await db.models.Message.create({
-      message: message,
-      sender: userId,
 
-      conversation: conversationId,
-    });
-    await db.models.Conversation.updateOne(
-      { _id: conversationId },
+    await db.models.Chat.updateOne(
       {
-        $set: {
-          latestMessage: message,
+        _id: conversationId,
+      },
+      {
+        $push: {
+          messages: {
+            sender: userId,
+            message,
+          },
         },
       }
     );
   }
 
-  let conversation = await db.models.Conversation.findOne({
+  let chat = await db.models.Chat.findOne({
     _id: conversationId,
   });
   if (!conversationId) {
@@ -54,40 +59,52 @@ export async function action({ request }) {
       form.get("participant")
     );
 
-    conversation = await db.models.Conversation.create({
+    chat = await db.models.Chat.create({
       participants: [
         {
           userId: user._id,
-          name: `${user.firstname} ${user.lastname}`,
-          image: user.image,
         },
         {
           userId: participant._id,
-          name: `${participant.firstname} ${participant.lastname}`,
-          image: participant.image,
         },
       ],
-      latestMessage: "New conversation",
+      messages: [
+        {
+          message: "New chat started",
+        },
+      ],
     });
   }
-  const messages = await db.models.Message.find({
-    conversation: conversationId,
-  }).sort({ createdAt: 1 });
-  return { conversation, messages, conversationId };
+  const messages = await db.models.Chat.findOne({
+    _id: conversationId,
+  }).select({ messages: 1 });
+  console.log(messages.messages);
+
+  return { chat, conversationId, messages: messages.messages };
 }
 
 export default function Chats() {
   let hasJs = useJs();
+  let transition = useTransition();
 
   const actionData = useActionData();
-
+  console.log(actionData?.chat);
   const { userId, conversations } = useLoaderData();
+  let formRef = useRef();
+
+  useEffect(() => {}, [userId]);
+
+  const buttonText =
+    transition.state === "submitting" &&
+    transition.submission.formData.get("_action") === "sendMessage"
+      ? "Sending..."
+      : "Send";
 
   return (
     <div className="flex gap-4 h-screen -my-8 py-8">
       <div className="bg-white p-4 rounded-xl shadow-lg w-80 flex flex-col gap-2  scrollbar:hidden">
         <h1 className=" font-semibold text-2xl ">Chats</h1>
-        <Form>
+        <Form method="get">
           <input
             className=" p-2 rounded-full mr-2 border border-gray-200"
             type="search"
@@ -145,8 +162,8 @@ export default function Chats() {
         <h2 className=" text-lg font-medium">Chat with name</h2>
         <div className=" ">
           <div className=" py-4 px-2 max-h-screen overflow-y-scroll  flex flex-col gap-4 justify-end">
-            {actionData?.messages?.length > 0 ? (
-              actionData.messages.map((message) => (
+            {actionData?.chat.messages.length > 0 ? (
+              actionData.chat.messages.map((message) => (
                 <div
                   key={message._id}
                   className={
@@ -204,10 +221,14 @@ export default function Chats() {
             />
 
             <button
+              disabled={
+                transition.state === "submitting" &&
+                transition.submission.formData.get("_action") === "sendMessage"
+              }
               type="submit"
               className="  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mr-4"
             >
-              Send
+              {buttonText}
             </button>
           </Form>
         </div>
