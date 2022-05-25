@@ -83,7 +83,7 @@ export async function action({ request }) {
       },
       {
         participants: {
-          $elemMatch: { participantId },
+          $elemMatch: { name: participantId },
         },
       },
     ],
@@ -105,7 +105,9 @@ export async function action({ request }) {
         {
           userId: participant._id,
           name: `${participant.firstname} ${participant.lastname}`,
-          image: participant.image.name,
+          image: participant.image?.name
+            ? participant.image.name
+            : "403017_avatar_default_head_person_unknown_icon-1653151654690.png",
         },
       ],
       messages: [
@@ -186,7 +188,11 @@ export default function Chats() {
                       value={chat.participants[1]._id}
                     />
                     <img
-                      src="/403017_avatar_default_head_person_unknown_icon.png"
+                      src={
+                        chat.participants.image
+                          ? chat.participants.image
+                          : "/403017_avatar_default_head_person_unknown_icon.png"
+                      }
                       alt=""
                       className="w-12 h-12 rounded-full mr-2"
                     />
@@ -280,7 +286,6 @@ export default function Chats() {
   );
 }
 
-//TODO set up a chat with a user
 //TODO add image to users
 //TODO Add ability to delete messages
 // TODO fix overflow of messages with no scroll
