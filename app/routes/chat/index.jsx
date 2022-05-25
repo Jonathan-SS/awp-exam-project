@@ -83,7 +83,7 @@ export async function action({ request }) {
       },
       {
         participants: {
-          $elemMatch: { name: participantId },
+          $elemMatch: { userId: participantId },
         },
       },
     ],
