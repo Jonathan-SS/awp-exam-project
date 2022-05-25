@@ -100,7 +100,9 @@ export async function action({ request }) {
         {
           userId: user._id,
           name: `${user.firstname} ${user.lastname}`,
-          image: user.image.name,
+          image: participant.image?.name
+            ? participant.image.name
+            : "403017_avatar_default_head_person_unknown_icon-1653151654690.png",
         },
         {
           userId: participant._id,
