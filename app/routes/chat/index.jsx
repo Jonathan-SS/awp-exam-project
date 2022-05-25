@@ -95,6 +95,7 @@ export async function action({ request }) {
     const user = await db.models.User.findById(userId);
     const participant = await db.models.User.findById(form.get("participant"));
 
+    console.log("participant", participant);
     chat = await db.models.Chat.create({
       participants: [
         {
@@ -294,3 +295,5 @@ export default function Chats() {
 
 // TODOne next, fix whole chat logic to new schema
 // TODO fix this bug
+
+// TODO find a way to get the info of the participant who is not the user
