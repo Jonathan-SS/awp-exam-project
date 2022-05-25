@@ -90,52 +90,59 @@ const postsSchema = new Schema(
   { timestamps: true }
 );
 
-const chatSchema = new Schema({
-  participants: [
-    {
-      userId: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
-      name: {
-        type: String,
-        required: true,
-      },
-      image: {
-        type: String,
-      },
+const chatSchema = new Schema(
+  {
+    test: {
+      type: String,
+      default: "test333",
     },
-    {
-      userId: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
+    participants: [
+      {
+        userId: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+        },
+        name: {
+          type: String,
+          required: true,
+        },
+        image: {
+          type: String,
+        },
       },
-      name: {
-        type: String,
-        required: true,
+      {
+        userId: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+        },
+        name: {
+          type: String,
+          required: true,
+        },
+        imageLink: {
+          type: String,
+        },
       },
-      imageLink: {
-        type: String,
+    ],
+    messages: [
+      {
+        sender: {
+          type: Schema.Types.ObjectId,
+          ref: "USer",
+        },
+        message: {
+          type: String,
+          required: true,
+        },
+        date: {
+          type: Date,
+          default: Date.now,
+        },
       },
-    },
-  ],
-  messages: [
-    {
-      sender: {
-        type: Schema.Types.ObjectId,
-        ref: "USer",
-      },
-      message: {
-        type: String,
-        required: true,
-      },
-      date: {
-        type: Date,
-        default: Date.now,
-      },
-    },
-  ],
-});
+    ],
+  },
+  { timestamps: true }
+);
 
 //TODO: nake only one schema for all users
 

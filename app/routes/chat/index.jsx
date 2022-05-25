@@ -16,11 +16,34 @@ export async function loader({ request, params }) {
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);
   const userId = session.get("userId");
-  const chats = await db.models.Chat.find({
-    participants: {
-      $elemMatch: { userId },
-    },
-  });
+  const url = new URL(request.url);
+  const nameSearch = url.searchParams.get("name");
+  console.log(nameSearch);
+
+  const chats = await db.models.Chat.find(
+    nameSearch
+      ? {
+          $and: [
+            {
+              participants: {
+                $elemMatch: { userId },
+              },
+            },
+            {
+              participants: {
+                $elemMatch: { name: { $regex: new RegExp(nameSearch, "i") } },
+              },
+            },
+          ],
+        }
+      : {
+          participants: {
+            $elemMatch: { userId },
+          },
+        }
+  ).sort({ updatedAt: -1 });
+  console.log("chats", chats);
+
   return { userId, chats };
 }
 
@@ -31,41 +54,44 @@ export async function action({ request }) {
   const session = await getSession(cookie);
   const userId = session.get("userId");
   const chatId = form.get("chatId");
+  const participantId = form.get("participantId");
+  let chat = {};
 
   if (form.get("_action") === "sendMessage") {
     const message = form.get("message");
-    console.log("besked: ", message);
 
-    const sendMessage = await db.models.Chat.updateOne(
+    await db.models.Chat.findOneAndUpdate(
       { _id: chatId },
       {
         $push: {
           messages: {
             sender: userId,
             message,
+            createdAt: new Date(),
           },
         },
       }
-      // {
-      //   _id: chatId,
-      // },
-      // {
-      //   $push: {
-      //     messages: {
-      //       sender: userId,
-      //       message,
-      //     },
-      //   },
-      // }
     );
-    console.log(sendMessage);
   }
 
-  let chat = await db.models.Chat.findOne({
-    _id: chatId,
+  let existingChatCheck = await db.models.Chat.findOne({
+    $and: [
+      {
+        participants: {
+          $elemMatch: { userId },
+        },
+      },
+      {
+        participants: {
+          $elemMatch: { participantId },
+        },
+      },
+    ],
   });
 
-  if (!chatId) {
+  console.log(existingChatCheck);
+
+  if (!existingChatCheck) {
     const user = await db.models.User.findById(userId);
     const participant = await db.models.User.findById(form.get("participant"));
 
@@ -88,13 +114,12 @@ export async function action({ request }) {
         },
       ],
     });
+  } else if (existingChatCheck) {
+    chat = await db.models.Chat.findOne({
+      _id: existingChatCheck._id,
+    });
   }
 
-  const messages = chat.messages;
-
-  console.log("chat:", chat);
-  console.log("chatId", chatId);
-  console.log("messages", messages);
   return { chat, chatId, messages: chat.messages };
 }
 
@@ -104,8 +129,15 @@ export default function Chats() {
   const actionData = useActionData();
   console.log(actionData?.chat);
   const { chats, userId } = useLoaderData();
-  console.log(actionData?.messages);
+  const [chatId, setChatId] = useState("NA");
+  console.log("ID", actionData?.chatId);
   console.log("den her");
+
+  useEffect(() => {
+    if (actionData?.chatId) {
+      setChatId(actionData?.chatId);
+    }
+  }, [actionData]);
 
   const buttonText =
     transition.state === "submitting" &&
@@ -229,13 +261,7 @@ export default function Chats() {
               placeholder="Message..."
             />
             <input type="hidden" name="_action" value="sendMessage" />
-            <input
-              type="hidden"
-              name="conversationId"
-              value={
-                actionData?.conversationId ? actionData?.conversationId : "NA"
-              }
-            />
+            <input type="hidden" name="chatId" value={chatId} />
 
             <button
               disabled={
@@ -259,5 +285,5 @@ export default function Chats() {
 //TODO Add ability to delete messages
 // TODO fix overflow of messages with no scroll
 
-// TODO next, fix whole chat logic to new schema
+// TODOne next, fix whole chat logic to new schema
 // TODO fix this bug
