@@ -24,9 +24,7 @@ export async function loader({ request, params }) {
               },
             },
             {
-              participants: {
-                $elemMatch: { name: { $regex: new RegExp(nameSearch, "i") } },
-              },
+              "participants.name": { $regex: new RegExp(nameSearch, "i") },
             },
           ],
         }
@@ -36,17 +34,23 @@ export async function loader({ request, params }) {
           },
         }
   ).sort({ updatedAt: -1 });
-  console.log(chats);
+  console.log(nameSearch);
 
   return { userId, chats, nameSearch };
 }
 
 export default function Chat() {
   let hasJs = useJs();
-  const { chats, nameSearch } = useLoaderData();
+  let { chats, nameSearch, userId } = useLoaderData();
+
+  chats.forEach((chat) => {
+    chat.participants = chat.participants.filter((participant) => {
+      return participant.userId !== userId;
+    });
+  });
 
   return (
-    <div className="flex gap-4 h-screen -my-8 py-8">
+    <div className="flex gap-4 h-screen -my-8 py-8 ">
       <div className="bg-white p-4 rounded-xl shadow-lg w-80 flex flex-col gap-2  scrollbar:hidden">
         <h1 className=" font-semibold text-2xl ">Chats</h1>
         <Form method="get">
@@ -67,7 +71,7 @@ export default function Chat() {
           )}
         </Form>
 
-        <div className="max-h-screen scrollbar:hidden max-w-40">
+        <div className="h-full max-w-40 overflow-y-scroll">
           {chats
             ? chats.map((chat) => (
                 <Form
@@ -85,7 +89,7 @@ export default function Chat() {
                     <input
                       type="hidden"
                       name="participantId"
-                      value={chat.participants[1].userId}
+                      value={chat.participants[0].userId}
                     />
 
                     <img
@@ -99,7 +103,7 @@ export default function Chat() {
                     />
                     <div className=" text-left">
                       <h3 className=" text-xl font-semibold">
-                        {chat.participants[1].name}
+                        {chat.participants[0].name}
                       </h3>
                       <p className=" text-slate-400 text-xs max-w-1/2 truncate">
                         {chat.messages[chat.messages.length - 1].message.slice(
@@ -114,7 +118,7 @@ export default function Chat() {
             : null}
         </div>
       </div>
-      <div className="bg-white p-4 rounded-xl shadow-lg flex-1 flex flex-col justify-between ">
+      <div className="bg-white p-4 h-full  rounded-xl shadow-lg flex-1 flex flex-col justify-between ">
         <h2 className=" text-lg font-medium">Chat with name</h2>
         <Outlet />
       </div>

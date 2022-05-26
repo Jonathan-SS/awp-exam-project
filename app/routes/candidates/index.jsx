@@ -164,7 +164,10 @@ export default function Candidates() {
                     {`${candidate.firstname} ${candidate.lastname}`}
                   </h2>
                 </Link>
-                <Form method="post" action="/chat/chat-conversation">
+                <Form
+                  method="post"
+                  action="/chat/chat-overview/chat-conversation"
+                >
                   <button className="flex" type="submit">
                     Chat
                   </button>

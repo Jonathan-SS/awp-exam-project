@@ -113,8 +113,8 @@ export default function ChatConversation() {
   console.log("user", user);
 
   return (
-    <div className=" ">
-      <div className=" py-4 px-2 max-h-screen overflow-y-scroll  flex flex-col gap-4 justify-end">
+    <>
+      <div className=" py-4 px-2 overflow-scroll h-1/2 flex flex-col gap-4 justify-end">
         {chat?.messages?.length > 0 ? (
           chat.messages.map((message) => (
             <div
@@ -178,6 +178,6 @@ export default function ChatConversation() {
           {buttonText}
         </button>
       </Form>
-    </div>
+    </>
   );
 }
