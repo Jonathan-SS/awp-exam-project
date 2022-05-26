@@ -89,8 +89,8 @@ export default function ChatConversation() {
   let transition = useTransition();
   const [chatId, setChatId] = useState("NA");
   const [chat, setChat] = useState({});
-  const [user, setUser] = useState();
-  const [participant, setParticipant] = useState();
+  const [user, setUser] = useState({});
+  const [participant, setParticipant] = useState({});
 
   const buttonText =
     transition.state === "submitting" &&
@@ -100,11 +100,14 @@ export default function ChatConversation() {
 
   useEffect(() => {
     setChat(actionData?.chat);
+  }, [actionData?.chat]);
+
+  useEffect(() => {
+    setParticipant(actionData?.participant);
     setChatId(actionData?.chatId);
     setUser(actionData?.user);
-    setParticipant(actionData?.participant);
-  }, [actionData]);
-  console.log("parti:", participant);
+  }, [actionData?.chatId, actionData?.participant, actionData?.user]);
+
   return (
     <div
       className="bg-white p-4  rounded-xl shadow-lg flex-1  flex-col justify-between flex
@@ -170,6 +173,7 @@ export default function ChatConversation() {
             />
             <input type="hidden" name="_action" value="sendMessage" />
             <input type="hidden" name="chatId" value={chatId} />
+            <input type="hidden" name="participantId" value={participant._id} />
 
             <button
               disabled={

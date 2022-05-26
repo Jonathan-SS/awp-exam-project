@@ -75,6 +75,7 @@ export function meta() {
 export async function loader({ request }) {
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);
+  
   if (session.has("userId")) {
     return true;
   }

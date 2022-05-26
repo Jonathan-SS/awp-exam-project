@@ -1,10 +1,9 @@
 import {
   Form,
-  useActionData,
   useLoaderData,
   useSubmit,
 } from "@remix-run/react";
-import { useState, useEffect } from "react";
+
 import { getSession, requireSession } from "../../sessions.server";
 import useJs from "../../hooks/useJs";
 import connectDb from "~/db/connectDb.server";

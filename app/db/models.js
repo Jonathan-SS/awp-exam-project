@@ -109,6 +109,10 @@ const chatSchema = new Schema(
         image: {
           type: String,
         },
+        hasRead: {
+          type: Boolean,
+          default: false,
+        },
       },
       {
         userId: {
@@ -121,6 +125,10 @@ const chatSchema = new Schema(
         },
         imageLink: {
           type: String,
+        },
+        hasRead: {
+          type: Boolean,
+          default: false,
         },
       },
     ],
