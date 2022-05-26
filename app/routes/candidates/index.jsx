@@ -11,6 +11,10 @@ export async function loader({ params, request }) {
   const tag = url.searchParams.get("tag");
   const sort = url.searchParams.get("sort");
   const allParams = { name, tag, sort };
+  const allTags = await db.models.User.find({}, { tags: 1, _id: 0 });
+  const allTagsArray = allTags.map(({ tags }) => tags).flat();
+  const allTagsArrayUnique = [...new Set(allTagsArray)];
+  console.log(allTagsArrayUnique);
 
   console.log(name);
 
@@ -140,11 +144,11 @@ export default function Candidates() {
           )}
         </Form>
       </div>
-      <ul className="flex py-2 pt-4 gap-4 flex-wrap justify-start">
+      <ul className=" py-2 pt-4 gap-4 justify-start grid grid-cols-3">
         {candidates.map((candidate) => (
           <li
             key={candidate._id}
-            className="w-72 bg-white p-4 rounded-xl grow min-w-xs max-w-xs "
+            className=" bg-white p-4 rounded-xl grow max-w-md shadow-md "
           >
             <div className="flex">
               <Link to={`/candidates/${candidate._id}`} className="z-10">
@@ -168,8 +172,11 @@ export default function Candidates() {
                   method="post"
                   action="/chat/chat-overview/chat-conversation"
                 >
-                  <button className="flex" type="submit">
-                    Chat
+                  <button
+                    className=" bg-green-400 p-2 rounded-lg hover:bg-green-300 "
+                    type="submit"
+                  >
+                    Start chat
                   </button>
                   <input
                     type="hidden"
@@ -194,7 +201,10 @@ export default function Candidates() {
             </div>
 
             <div className="pt-2 flex flex-col gap-2">
-              <p>{candidate.description}</p>
+              <p>
+                {candidate.description &&
+                  candidate.description?.slice(0, 25) + "..."}
+              </p>
               <div className="flex gap-2"></div>
               <p className=" text-slate-400 text-sm">
                 {"Created: " +

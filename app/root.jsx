@@ -133,7 +133,6 @@ export function Layout({ children, ...rest }) {
             </>
           ) : null}
 
-          <MenuItem icon={<Tools />} label="Tools" to="/tools" />
           {!loggedin ? (
             <MenuItem icon={<Plus />} label="Create User" to="/create-user" />
           ) : null}

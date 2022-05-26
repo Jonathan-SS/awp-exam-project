@@ -1,9 +1,15 @@
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useSubmit,
+} from "@remix-run/react";
 import { useState, useEffect } from "react";
 import { getSession, requireSession } from "../../sessions.server";
 import useJs from "../../hooks/useJs";
 import connectDb from "~/db/connectDb.server";
 import { Outlet } from "react-router";
+import Close from "../../icons/Close";
 
 export async function loader({ request, params }) {
   await requireSession(request);
@@ -39,8 +45,22 @@ export async function loader({ request, params }) {
   return { userId, chats, nameSearch };
 }
 
+export async function action({ request }) {
+  const form = await request.formData();
+  const db = await connectDb();
+  if (form.get("_action") === "deleteChat") {
+    const chatId = form.get("chatId");
+    await db.models.Chat.findOneAndDelete({ _id: chatId });
+  }
+  return null;
+}
+
 export default function Chat() {
   let hasJs = useJs();
+  const submit = useSubmit();
+  function handleChange(event) {
+    submit(event.currentTarget, { replace: true });
+  }
   let { chats, nameSearch, userId } = useLoaderData();
 
   chats.forEach((chat) => {
@@ -53,7 +73,7 @@ export default function Chat() {
     <div className="flex gap-4 h-screen -my-8 py-8 ">
       <div className="bg-white p-4 rounded-xl shadow-lg w-80 flex flex-col gap-2  scrollbar:hidden">
         <h1 className=" font-semibold text-2xl ">Chats</h1>
-        <Form method="get">
+        <Form method="get" onChange={handleChange}>
           <input
             className=" p-2 rounded-full mr-2 border border-gray-200"
             type="search"
@@ -71,57 +91,64 @@ export default function Chat() {
           )}
         </Form>
 
-        <div className="h-full max-w-40 overflow-y-scroll">
+        <div className="h-full max-w-40 overflow-y-auto">
           {chats
             ? chats.map((chat) => (
-                <Form
-                  key={chat._id}
-                  method="post"
-                  action="/chat/chat-overview/chat-conversation"
-                  className=" border-b py-2 w-full"
-                >
-                  <button
-                    className="flex"
-                    type="submit"
-                    name="chatId"
-                    value={chat._id}
+                <div key={chat._id} className="relative">
+                  <Form method="post">
+                    <input type="hidden" name="chatId" value={chat._id} />
+                    <button
+                      className="flex flex-row-reverse bg-red-500 items-end ml-auto rounded-full hover:bg-red-400 p-1 absolute right-1 top-1/2 -translate-y-1/2"
+                      type="submit"
+                      name="_action"
+                      value="deleteChat"
+                    >
+                      <Close className="h-4 w-4" />
+                    </button>
+                  </Form>
+                  <Form
+                    method="post"
+                    action="/chat/chat-overview/chat-conversation"
+                    className=" border-b py-2 w-full "
                   >
-                    <input
-                      type="hidden"
-                      name="participantId"
-                      value={chat.participants[0].userId}
-                    />
+                    <input type="hidden" name="chatId" value={chat._id} />
 
-                    <img
-                      src={
-                        chat.participants.image
-                          ? chat.participants.image
-                          : "/403017_avatar_default_head_person_unknown_icon.png"
-                      }
-                      alt=""
-                      className="w-12 h-12 rounded-full mr-2"
-                    />
-                    <div className=" text-left">
-                      <h3 className=" text-xl font-semibold">
-                        {chat.participants[0].name}
-                      </h3>
-                      <p className=" text-slate-400 text-xs max-w-1/2 truncate">
-                        {chat.messages[chat.messages.length - 1].message.slice(
-                          0,
-                          25
-                        ) + "..."}
-                      </p>
-                    </div>
-                  </button>
-                </Form>
+                    <button className="flex" type="submit">
+                      <input
+                        type="hidden"
+                        name="participantId"
+                        value={chat.participants[0].userId}
+                      />
+
+                      <img
+                        src={
+                          chat.participants.image
+                            ? `/uploads/${chat.participants.image}`
+                            : "/403017_avatar_default_head_person_unknown_icon.png"
+                        }
+                        alt=""
+                        className="w-12 h-12 rounded-full mr-2"
+                      />
+                      <div className=" text-left">
+                        <h3 className=" text-xl font-semibold">
+                          {chat.participants[0].name}
+                        </h3>
+                        <p className=" text-slate-400 text-xs max-w-1/2 truncate">
+                          {chat.messages.length > 0
+                            ? chat.messages[
+                                chat.messages.length - 1
+                              ].message.slice(0, 25) + "..."
+                            : "No messages yet"}
+                        </p>
+                      </div>
+                    </button>
+                  </Form>
+                </div>
               ))
             : null}
         </div>
       </div>
-      <div className="bg-white p-4 h-full  rounded-xl shadow-lg flex-1 flex flex-col justify-between ">
-        <h2 className=" text-lg font-medium">Chat with name</h2>
-        <Outlet />
-      </div>
+      <Outlet />
     </div>
   );
 }

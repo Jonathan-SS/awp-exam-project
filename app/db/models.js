@@ -128,15 +128,10 @@ const chatSchema = new Schema(
       {
         sender: {
           type: Schema.Types.ObjectId,
-          ref: "USer",
+          ref: "User",
         },
         message: {
           type: String,
-          required: true,
-        },
-        date: {
-          type: Date,
-          default: Date.now,
         },
       },
     ],

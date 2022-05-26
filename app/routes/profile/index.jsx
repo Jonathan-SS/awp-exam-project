@@ -217,12 +217,12 @@ export default function Profile() {
           </Form>
         </div>
         {posts.map((post) => (
-          <div key={post._id} className="bg-white p-6 rounded-xl shadow-lg">
+          <div
+            key={post._id}
+            className="bg-white p-6 rounded-xl shadow-lg h-100 h1"
+          >
             <div className="rounded-lg relative">
-              <div
-                className="  h1:text-2xl h1:font-bold h1:mb-4 h2:mb-2 h2:text-xl h2:font-semibold h3:text-lg h3:font-semibold h4:text-md h4:font-semibold img:max-h-64 img:shadow-md img:rounded-lg img:mb-2"
-                id="markdownStyle"
-              >
+              <div className=" h1:text-3xl">
                 <Markdown>{post.body}</Markdown>
                 <Link to={`/candidates/${post.user.userId}`}>
                   <p className="text-slate-400">{`Candidate: ${post.user.userName}`}</p>
