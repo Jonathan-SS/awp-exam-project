@@ -1,4 +1,3 @@
-import { redirect } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -23,7 +22,6 @@ import Logo from "./icons/Logo";
 import Plus from "./icons/Plus";
 import Posts from "./icons/Posts";
 import Profile from "./icons/Profile";
-import Tools from "./icons/Tools";
 import LogOut from "./icons/LogOut";
 import Chat from "./icons/Chat";
 import { getSession } from "./sessions.server";
@@ -129,7 +127,7 @@ export function Layout({ children, ...rest }) {
           {loggedin ? (
             <>
               <MenuItem icon={<Profile />} label="Profile" to="/profile" />
-              <MenuItem icon={<Chat />} label="Chat" to="/chat" />
+              <MenuItem icon={<Chat />} label="Chat" to="/chat/chat-overview" />
             </>
           ) : null}
 
