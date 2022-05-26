@@ -164,13 +164,13 @@ export default function Candidates() {
                     {`${candidate.firstname} ${candidate.lastname}`}
                   </h2>
                 </Link>
-                <Form method="post" action="/chat?index">
+                <Form method="post" action="/chat/chat-conversation">
                   <button className="flex" type="submit">
                     Chat
                   </button>
                   <input
                     type="hidden"
-                    name="participant"
+                    name="participantId"
                     value={candidate._id}
                   />
                 </Form>
