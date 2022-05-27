@@ -13,9 +13,11 @@ export async function loader({ params, request }) {
   const allParams = { name, tag, sort };
   const allTags = await db.models.User.find({}, { tags: 1, _id: 0 });
   const allTagsArray = allTags.map(({ tags }) => tags).flat();
-  const allTagsArrayUnique = [...new Set(allTagsArray)];
-  console.log(allTagsArrayUnique);
-
+  const allTagsArrayUnique = [...new Set(allTagsArray)].sort((a, b) =>
+    a.localeCompare(b)
+  );
+  console.log(tag);
+  console.log(sort);
   console.log(name);
 
   if (tag) {
@@ -42,12 +44,13 @@ export async function loader({ params, request }) {
             }
           : {
               tags: tag,
+              userType: "candidate",
             }
-      ).sort({ [sort]: -1 }),
+      ).sort({ sort: 1 }),
       allParams: allParams,
+      tags: allTagsArrayUnique,
     };
   }
-
   return {
     candidates: await db.models.User.find(
       name
@@ -67,9 +70,10 @@ export async function loader({ params, request }) {
               },
             ],
           }
-        : {}
-    ).sort({ [sort]: -1 }),
+        : { userType: "candidate" }
+    ).sort({ sort: 1 }),
     allParams: allParams,
+    tags: allTagsArrayUnique,
   };
 }
 
@@ -77,74 +81,84 @@ export default function Candidates() {
   const submit = useSubmit();
 
   const hasJs = useJs();
-  const { candidates, allParams } = useLoaderData();
+  const { candidates, allParams, tags } = useLoaderData();
   function handleChange(event) {
     submit(event.currentTarget, { replace: true });
   }
-
   return (
     <div>
       <h1 className="text-3xl font-bold mb-3">All of our IT cadidates</h1>
-      <div className="flex items-center gap-4">
-        <Form method="get" onChange={handleChange}>
-          <input
-            className=" p-2 rounded-full mr-2"
-            type="search"
-            name="name"
-            placeholder="Search..."
-            defaultValue={allParams.name}
-          />
-          {!hasJs && (
-            <button
-              type="submit"
-              className="  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mr-4"
+      <div>
+        <Form
+          className="grid items-center gap-4 grid-cols-2 md:flex md:items-center"
+          method="get"
+          onChange={handleChange}
+        >
+          <div>
+            <input
+              className=" p-2 rounded-full mr-2"
+              type="search"
+              name="name"
+              placeholder="Search..."
+              defaultValue={allParams.name}
+            />
+            {!hasJs && (
+              <button
+                type="submit"
+                className="  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
+              >
+                Search
+              </button>
+            )}
+          </div>
+          <div className="flex justify-end">
+            <select
+              name="sort"
+              type="sort"
+              className="p-2 rounded-full  md:mr-2  "
+              defaultValue={{ label: allParams.sort, value: allParams.sort }}
             >
-              Search
-            </button>
-          )}
-
-          <select
-            name="sort"
-            type="sort"
-            className="p-2 rounded-full mr-2  "
-            defaultValue={{ label: allParams.sort, value: allParams.sort }}
-          >
-            <option value="">Sort by</option>
-            <option value="firstname">First Name</option>
-            <option value="lastname">Last Name</option>
-            <option value="createdAt">Date</option>
-          </select>
-          {!hasJs && (
-            <button
-              type="submit"
-              className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mr-4"
+              <option value="">Sort by</option>
+              <option value="firstname">First Name</option>
+              <option value="lastname">Last Name</option>
+              <option value="createdAt">Date</option>
+            </select>
+            {!hasJs && (
+              <button
+                type="submit"
+                className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
+              >
+                Sort
+              </button>
+            )}
+          </div>
+          <div>
+            <select
+              name="tag"
+              type="tag"
+              id=""
+              className="p-2 rounded-full mr-2"
+              defaultValue={{ label: allParams.tag, value: allParams.tag }}
             >
-              Sort
-            </button>
-          )}
-
-          <select
-            name="tag"
-            type="tag"
-            id=""
-            className="p-2 rounded-full mr-2"
-            defaultValue={{ label: allParams.tag, value: allParams.tag }}
-          >
-            <option value="">Technology</option>
-            <option value="WP">WP</option>
-            <option value="vue">Vue</option>
-          </select>
-          {!hasJs && (
-            <button
-              type="submit"
-              className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mr-4"
-            >
-              Apply
-            </button>
-          )}
+              <option value="">Technology</option>
+              {tags.map((tag) => (
+                <option key={tag} value={tag}>
+                  {tag}
+                </option>
+              ))}
+            </select>
+            {!hasJs && (
+              <button
+                type="submit"
+                className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
+              >
+                Apply
+              </button>
+            )}
+          </div>
         </Form>
       </div>
-      <ul className=" py-2 pt-4 gap-4 justify-start grid grid-cols-3">
+      <ul className=" py-2 pt-4 gap-4 justify-start grid grid-cols-1 md:grid-cols-3">
         {candidates.map((candidate) => (
           <li
             key={candidate._id}

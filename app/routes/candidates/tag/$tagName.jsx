@@ -67,7 +67,7 @@ export default function Tag() {
           {!hasJs && (
             <button
               type="submit"
-              className="  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mr-4"
+              className="  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
             >
               Search
             </button>
@@ -87,7 +87,7 @@ export default function Tag() {
           {!hasJs && (
             <button
               type="submit"
-              className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mr-4"
+              className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
             >
               Sort
             </button>
@@ -107,7 +107,7 @@ export default function Tag() {
           {!hasJs && (
             <button
               type="submit"
-              className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mr-4"
+              className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
             >
               Apply
             </button>

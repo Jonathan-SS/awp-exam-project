@@ -21,13 +21,7 @@ export async function loader({ request, params }) {
   const session = await getSession(cookie);
   const userId = session.get("userId");
   const user = await db.models.User.findById(userId);
-  const posts = [];
-  const postIds = user.get("posts");
-
-  for (let i = 0; i < postIds.length; i++) {
-    const post = await db.models.Post.findById(postIds[i]);
-    posts.push(post);
-  }
+  const posts = await db.models.Post.find({ "user.userId": userId });
 
   return { user, posts };
 }
@@ -55,6 +49,7 @@ export const action = async ({ request }) => {
         userId: userId,
         userName: form.get("userName"),
       },
+      postType: form.get("postType"),
     });
 
     await db.models.User.updateOne(
@@ -95,8 +90,8 @@ export default function Profile() {
   }, [isAdding]);
 
   return (
-    <div className="flex gap-4">
-      <div className=" h-full w-80 bg-white p-4 rounded-xl shadow-md">
+    <div className="flex gap-8 md:gap-4 flex-col md:flex-row">
+      <div className=" h-full md:w-80 bg-white p-4 rounded-xl shadow-md">
         <div className=" relative">
           <img
             src={
@@ -176,6 +171,11 @@ export default function Profile() {
             method="post"
             className="flex gap-4 items-start flex-col"
           >
+            <input
+              type="hidden"
+              name="postType"
+              value={user.userType === "candidate" ? "post" : "jobPost"}
+            />
             {actionData ? (
               <p className="text-red-500 px-4 -m-3 ">
                 {actionData.errors?.body.message}
@@ -206,7 +206,7 @@ export default function Profile() {
               value={`${user.firstname} ${user.lastname}`}
             />
             <button
-              className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md"
+              className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md"
               type="submit"
               name="_action"
               value="addPost"
@@ -219,7 +219,7 @@ export default function Profile() {
         {posts.map((post) => (
           <div
             key={post._id}
-            className="bg-white p-6 rounded-xl shadow-lg h-100 h1"
+            className="bg-white p-6 rounded-xl shadow-md h-100 h1"
           >
             <div className="rounded-lg relative">
               <div className=" h1:text-3xl">
@@ -244,7 +244,7 @@ export default function Profile() {
                   name="_action"
                   value="deletePost"
                   disabled={transition.state === "submitting"}
-                  className="p-1 bg-red-500 rounded-full shadow-lg hover:shadow-md"
+                  className="p-1 bg-red-500 rounded-full shadow-md hover:shadow-md"
                 >
                   <Close className="h-4 w-4" color="white" />
                 </button>

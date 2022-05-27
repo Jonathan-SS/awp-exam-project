@@ -68,7 +68,7 @@ export default function LogIn(params) {
         <h1 className=" text-4xl font-bold mb-4 ">Great to see you again!</h1>
       </div>
 
-      <Form method="post" className="flex flex-col gap-2 w-96">
+      <Form method="post" className="flex flex-col gap-2 w-full md:w-96">
         {actionData?.errors?.email ? (
           <p className="text-red-500 px-2 ">{actionData?.errors.email}</p>
         ) : (
@@ -105,12 +105,12 @@ export default function LogIn(params) {
 
         <button
           type="submit"
-          className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mt-2"
+          className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mt-2"
         >
           Log In
         </button>
       </Form>
-      <Link className=" w-96 text-left px-2 mt-2" to="/create-user">
+      <Link className=" md:w-96 text-left px-2 mt-2" to="/create-user">
         Sign up!
       </Link>
     </div>

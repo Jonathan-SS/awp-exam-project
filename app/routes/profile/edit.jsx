@@ -10,7 +10,6 @@ import {
 } from "@remix-run/node";
 import { getSession, requireSession } from "../../sessions.server";
 import Plus from "../../icons/Plus";
-import useJs from "../../hooks/useJs";
 
 //TODO add delete prfile option
 export async function loader({ request }) {
@@ -56,9 +55,17 @@ export async function action({ request }) {
   const lastname = formData.get("lastname");
   const email = formData.get("email");
   const description = formData.get("description");
-  const tags = formData.get("tags")?.split(",");
+  const tags = formData
+    .get("tags")
+    ?.split(",")
+    .filter((tag) => tag.length > 0);
+
   const linksText = formData.get("links");
-  const links = formData.get("links")?.split("\n");
+  const links = formData
+    .get("links")
+    ?.split("\n")
+    .filter((link) => link.length > 0);
+
   const seperatedLinks = [];
   links?.forEach((link) => {
     const colon = link.split(";");
@@ -126,11 +133,25 @@ export default function Candidate() {
     submit(null, { method: "post", action: "../delete-account" });
   }
 
+  function checkNumberOfLines(e) {
+    const lines = e.target.value.split("\n").length;
+    if (lines > 3) {
+      e.target.value = "That's too many links, try again";
+    }
+  }
+  function checkNumberOfCommas(e) {
+    const commas = e.target.value.split(",").length;
+    console.log(commas);
+    if (commas > 5) {
+      e.target.value = "That's too many tags, try again";
+    }
+  }
+
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center md:w-96">
       <Logo />
       <div className="text-center mt-4 flex flex-col gap-4 ">
-        <h1 className=" text-4xl font-bold mb-4 ">
+        <h1 className=" text-2xl md:text-4xl font-bold mb-4 ">
           Time to add some more information
           <br /> to your profile?
         </h1>
@@ -139,7 +160,7 @@ export default function Candidate() {
       <Form
         method="post"
         encType="multipart/form-data"
-        className="flex flex-col gap-4 w-96"
+        className="flex flex-col gap-4 w-full"
         onChange={handleChange}
         reloadDocument
       >
@@ -161,7 +182,7 @@ export default function Candidate() {
               document.getElementById("file-upload").click();
             }}
             htmlFor="file-upload"
-            className=" block absolute bottom-2 right-20 rounded-full p-4 hover:shadow-md w-fit bg-white shadow-lg hover:cursor-pointer"
+            className=" block absolute bottom-2 right-20 rounded-full p-4 hover:shadow-md w-fit bg-white shadow-md hover:cursor-pointer"
           >
             <Plus />
           </button>
@@ -172,9 +193,12 @@ export default function Candidate() {
       <Form
         method="post"
         encType="multipart/form-data"
-        className="flex flex-col gap-4 w-96"
+        className="flex flex-col gap-4 w-full"
         reloadDocument
       >
+        <label htmlFor="firstname" className="-my-3 px-2 text-slate-400">
+          First Name
+        </label>
         <input
           type="text"
           name="firstname"
@@ -182,6 +206,9 @@ export default function Candidate() {
           className=" w-full py-2 px-4 rounded-full border border-gray-300"
           defaultValue={user.firstname}
         />
+        <label htmlFor="lastname" className="-my-3 px-2 text-slate-400">
+          Last Name
+        </label>
         <input
           type="text"
           name="lastname"
@@ -189,6 +216,9 @@ export default function Candidate() {
           className=" w-full py-2 px-4 rounded-full border border-gray-300"
           defaultValue={user.lastname}
         />
+        <label htmlFor="email" className="-my-3 px-2 text-slate-400">
+          Email
+        </label>
         <input
           type="text"
           name="email"
@@ -196,15 +226,19 @@ export default function Candidate() {
           className=" w-full py-2 px-4 rounded-full border border-gray-300"
           defaultValue={user.email}
         />
-        <p htmlFor="Password" className=" -my-3 px-2 text-slate-400">
-          Minimum 8 characters
-        </p>
+        <label htmlFor="Password" className="-my-3 px-2 text-slate-400">
+          Password - Minimum 8 characters
+        </label>
+
         <input
           type="text"
           name="Password"
           placeholder="New Password"
           className=" w-full py-2 px-4 rounded-full border border-gray-300"
         />
+        <label htmlFor="PasswordRepeat" className="-my-3 px-2 text-slate-400">
+          Repeat New Password
+        </label>
 
         <input
           type="text"
@@ -220,6 +254,7 @@ export default function Candidate() {
           id=""
           cols="30"
           rows="4"
+          maxlength="400"
           className=" w-full py-2 px-4 rounded-lg border border-gray-300"
           placeholder="Max. 400 characters."
           defaultValue={user.description}
@@ -232,6 +267,7 @@ export default function Candidate() {
           name="tags"
           cols="30"
           rows="4"
+          onKeyUp={checkNumberOfCommas}
           placeholder=" Max. 5 tags. Seperate with comma."
           className=" w-full py-2 px-4 rounded-lg border border-gray-300"
           defaultValue={user.tags}
@@ -244,20 +280,21 @@ export default function Candidate() {
           name="links"
           cols="30"
           rows="4"
+          onKeyUp={checkNumberOfLines}
           placeholder="Max. 3 links. Seperate with new line. Facebook;https://www.facebook.com "
           className=" w-full py-2 px-4 rounded-lg border border-gray-300"
           defaultValue={user.linksAsText}
         />
         <button
           type="submit"
-          className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md"
+          className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md"
           name="_actionAfterSubmit"
           value="redirect"
         >
           Update
         </button>
         <button
-          className=" bg-red-500 px-3 py-2 rounded-full hover:bg-red-400 shadow-lg hover:shadow-md"
+          className=" bg-red-500 px-3 py-2 rounded-full hover:bg-red-400 shadow-md hover:shadow-md"
           name="_actionAfterSubmit"
           value="deleteAccount"
           onClick={() => {

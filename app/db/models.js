@@ -56,14 +56,6 @@ const userSchema = new Schema(
     linksAsText: {
       type: String,
     },
-    posts: {
-      type: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Post",
-        },
-      ],
-    },
   },
   { timestamps: true }
 );

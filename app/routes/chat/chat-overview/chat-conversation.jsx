@@ -10,11 +10,9 @@ export async function action({ request }) {
   const session = await getSession(cookie);
   const userId = session.get("userId");
   const chatId = form.get("chatId");
-  console.log("chatId", chatId);
   const user = await db.models.User.findById(userId);
   const participant = await db.models.User.findById(form.get("participantId"));
   let chat = {};
-  console.log("user", chatId);
 
   if (form.get("_action") === "sendMessage") {
     const message = form.get("message");
@@ -53,6 +51,14 @@ export async function action({ request }) {
   if (chatId) {
     chat = await db.models.Chat.findOne({
       _id: chatId,
+    });
+
+    // TODO find a way to return new actionData on change
+    db.models.Chat.watch().on("change", async (change) => {
+      chat = await db.models.Chat.findOne({
+        _id: chatId,
+      });
+      return chat;
     });
   } else {
     chat = await exsistingChatCheck(userId, form.get("participantId"));
@@ -108,9 +114,14 @@ export default function ChatConversation() {
     setUser(actionData?.user);
   }, [actionData?.chatId, actionData?.participant, actionData?.user]);
 
+  console.log("chat", chat);
+  console.log("chatId", chatId);
+  console.log("user", user);
+  console.log("participant", participant);
+
   return (
     <div
-      className="bg-white p-4  rounded-xl shadow-lg flex-1  flex-col justify-between flex
+      className="bg-white p-4  rounded-xl shadow-md flex-1  flex-col justify-between flex
     "
     >
       {chat ? (
@@ -136,8 +147,12 @@ export default function ChatConversation() {
                     <img
                       src={
                         user._id === message.sender
-                          ? `/uploads/${user?.image?.name}`
-                          : `/uploads/${participant?.image?.name}`
+                          ? user?.image?.name
+                            ? user.image.name
+                            : "/403017_avatar_default_head_person_unknown_icon.png"
+                          : participant?.image?.name
+                          ? participant.image.name
+                          : "/403017_avatar_default_head_person_unknown_icon.png"
                       }
                       alt=""
                       className="w-12 h-12 rounded-full "
@@ -181,7 +196,7 @@ export default function ChatConversation() {
                 transition.submission.formData.get("_action") === "sendMessage"
               }
               type="submit"
-              className="  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mr-4"
+              className="  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
             >
               {buttonText}
             </button>

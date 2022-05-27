@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-export default function MenuItem({ icon, label, to }) {
+export default function MenuItem({ icon, label, to, onClick }) {
   function showToolTip(item) {
     const tooltip = document.getElementById(`${item}-ToolTip`);
 
@@ -21,11 +21,12 @@ export default function MenuItem({ icon, label, to }) {
       }}
       to={to}
       className={({ isActive }) =>
-        "rounded-full p-2 last-of-type:mt-auto " +
+        "rounded-full p-2 md:last-of-type:mt-auto menuItem " +
         (isActive
-          ? "bg-green-400 shadow-md"
-          : "shadow-lg hover:shadow-md bg-white")
+          ? "bg-green-400 shadow-lg"
+          : "shadow-md hover:shadow-md bg-white")
       }
+      onClick={onClick}
     >
       {icon}
       <div className="relative">

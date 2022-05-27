@@ -1,8 +1,4 @@
-import {
-  Form,
-  useLoaderData,
-  useSubmit,
-} from "@remix-run/react";
+import { Form, useLoaderData, useSubmit } from "@remix-run/react";
 
 import { getSession, requireSession } from "../../sessions.server";
 import useJs from "../../hooks/useJs";
@@ -69,8 +65,8 @@ export default function Chat() {
   });
 
   return (
-    <div className="flex gap-4 h-screen -my-8 py-8 ">
-      <div className="bg-white p-4 rounded-xl shadow-lg w-80 flex flex-col gap-2  scrollbar:hidden">
+    <div className="flex flex-col md:flex-row gap-4 h-screen -my-8 py-8 ">
+      <div className="bg-white p-4 rounded-xl shadow-md h-1/2 w-full md:w-80 flex flex-col gap-2  scrollbar:hidden">
         <h1 className=" font-semibold text-2xl ">Chats</h1>
         <Form method="get" onChange={handleChange}>
           <input
@@ -83,7 +79,7 @@ export default function Chat() {
           {!hasJs && (
             <button
               type="submit"
-              className="  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mr-4"
+              className="  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
             >
               Search
             </button>
@@ -121,8 +117,8 @@ export default function Chat() {
 
                       <img
                         src={
-                          chat.participants.image
-                            ? `/uploads/${chat.participants.image}`
+                          chat.participants[0].image
+                            ? `/uploads/${chat.participants[0].image}`
                             : "/403017_avatar_default_head_person_unknown_icon.png"
                         }
                         alt=""

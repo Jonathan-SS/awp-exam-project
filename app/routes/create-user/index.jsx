@@ -17,13 +17,13 @@ export default function CreateUser(params) {
         </p>
         <div className="flex gap-4 center justify-center">
           <Link
-            className="bg-green-400 px-3 py-2 rounded-full font-semibold hover:bg-green-300 shadow-lg hover:shadow"
+            className="bg-green-400 px-3 py-2 rounded-full font-semibold hover:bg-green-300 shadow-md hover:shadow"
             to="/create-user/candidate"
           >
             I am a candidate
           </Link>
           <Link
-            className="bg-green-400 px-3 py-2 rounded-full font-semibold hover:bg-green-300 shadow-lg hover:shadow "
+            className="bg-green-400 px-3 py-2 rounded-full font-semibold hover:bg-green-300 shadow-md hover:shadow "
             to="/create-user/recruiter"
           >
             I am a recruiter

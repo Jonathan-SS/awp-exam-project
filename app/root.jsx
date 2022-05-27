@@ -75,7 +75,7 @@ export function meta() {
 export async function loader({ request }) {
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);
-  
+
   if (session.has("userId")) {
     return true;
   }
@@ -107,10 +107,19 @@ export function Layout({ children, ...rest }) {
   function showMobileMenu() {
     const menu = document.getElementById("menu");
     menu.classList.toggle("hidden");
-    menu.classList.add("flex");
+    menu.classList.toggle("flex");
     menu.classList.toggle("-translate-x-full");
     navIsOpen ? setNavIsOpen(false) : setNavIsOpen(true);
   }
+
+  onscroll = (e) => {
+    if (window.scrollY > 0) {
+      document.getElementById("mobileHeader").classList.add("bg-white");
+    } else {
+      document.getElementById("mobileHeader").classList.remove("bg-white");
+    }
+  };
+
   return (
     <html lang="en">
       <head>
@@ -120,39 +129,85 @@ export function Layout({ children, ...rest }) {
       <body className="bg-slate-100 text-slate-800 font-sans md:flex">
         <aside
           id="menu"
-          className=" z-50 absolute md:fixed -translate-x-full hidden md:translate-x-0 md:flex flex-col h-100vh px-1 md:px-3 py-8 gap-6 "
+          className=" z-40 fixed -translate-x-full hidden md:translate-x-0 md:flex flex-col h-100vh px-1 md:px-3 py-8 gap-6 "
         >
-          <MenuItem icon={<Home />} label="Home" to="/" />
-          <MenuItem icon={<Posts />} label="Job posts" to="/job-posts" />
-          <MenuItem icon={<Candidates />} label="Candidates" to="/candidates" />
+          <MenuItem
+            icon={<Home />}
+            onClick={showMobileMenu}
+            label="Home"
+            to="/"
+          />
+          <MenuItem
+            icon={<Posts />}
+            onClick={showMobileMenu}
+            label="Job posts"
+            to="/job-posts"
+          />
+          <MenuItem
+            icon={<Candidates />}
+            onClick={showMobileMenu}
+            label="Candidates"
+            to="/candidates"
+          />
           {loggedin ? (
             <>
-              <MenuItem icon={<Profile />} label="Profile" to="/profile" />
-              <MenuItem icon={<Chat />} label="Chat" to="/chat/chat-overview" />
+              <MenuItem
+                icon={<Profile />}
+                onClick={showMobileMenu}
+                label="Profile"
+                to="/profile"
+              />
+              <MenuItem
+                icon={<Chat />}
+                onClick={showMobileMenu}
+                label="Chat"
+                to="/chat/chat-overview"
+              />
             </>
           ) : null}
 
           {!loggedin ? (
-            <MenuItem icon={<Plus />} label="Create User" to="/create-user" />
+            <MenuItem
+              icon={<Plus />}
+              onClick={showMobileMenu}
+              label="Create User"
+              to="/create-user"
+            />
           ) : null}
 
           {loggedin ? (
-            <MenuItem icon={<LogOut />} label="Logout" to="/logout" />
+            <MenuItem
+              icon={<LogOut />}
+              onClick={showMobileMenu}
+              label="Logout"
+              to="/logout"
+            />
           ) : (
-            <MenuItem icon={<LogIn />} label="Login" to="/login" />
+            <MenuItem
+              icon={<LogIn />}
+              onClick={showMobileMenu}
+              label="Login"
+              to="/login"
+            />
           )}
         </aside>
-        <div className="md:hidden flex justify-center py-1 px-2">
-          <div className=" absolute left-0 px-1">
+        <div
+          className="md:hidden top-0 fixed flex justify-center py-1  px-2 w-full rounded-lg "
+          id="mobileHeader"
+        >
+          <div className=" absolute left-0 px-1 z-50">
             <button onClick={showMobileMenu}>
               {navIsOpen ? <Close /> : <BurgerMenu />}
             </button>
           </div>
-
-          <Logo className="h-auto w-20" />
+          <Link to="/">
+            <Logo className="h-auto w-20" />
+          </Link>
         </div>
 
-        <main className="flex-1 px-4 py-7 ml-14 z-20">{children}</main>
+        <main className="flex-1 px-4 py-7 md:ml-14 z-20 md:mt-0 mt-4">
+          {children}
+        </main>
 
         <ScrollRestoration />
         <Scripts />
@@ -170,7 +225,7 @@ export function CatchBoundary() {
         <Bug />
         <h1 className=" text-5xl font-bold">{caught.statusText}</h1>
         <Link
-          className="text-white flex items-center h-fit  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-lg hover:shadow-md mt-4"
+          className="text-white flex items-center h-fit  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mt-4"
           to="/"
         >
           Go to the home page
