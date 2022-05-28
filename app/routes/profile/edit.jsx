@@ -148,7 +148,7 @@ export default function Candidate() {
   }
 
   return (
-    <div className="flex flex-col items-center md:w-96">
+    <div className="flex flex-col items-center m-auto md:w-96">
       <Logo />
       <div className="text-center mt-4 flex flex-col gap-4 ">
         <h1 className=" text-2xl md:text-4xl font-bold mb-4 ">
@@ -254,9 +254,9 @@ export default function Candidate() {
           id=""
           cols="30"
           rows="4"
-          maxlength="400"
+          maxlength="300"
           className=" w-full py-2 px-4 rounded-lg border border-gray-300"
-          placeholder="Max. 400 characters."
+          placeholder="Max. 300 characters."
           defaultValue={user.description}
         />
         <p htmlFor="tags" className=" -my-3 px-2 text-slate-400">

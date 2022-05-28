@@ -3,9 +3,14 @@ import { useState, useEffect } from "react";
 
 import connectDb from "~/db/connectDb.server.js";
 import useJs from "../../hooks/useJs";
+import Chat from "../../icons/Chat";
+import { getSession } from "../../sessions.server";
 
 export async function loader({ params, request }) {
   const db = await connectDb();
+  const cookie = request.headers.get("Cookie");
+  const session = await getSession(cookie);
+  const userId = session.get("userId");
   const url = new URL(request.url);
   const name = url.searchParams.get("name");
   const tag = url.searchParams.get("tag");
@@ -31,6 +36,7 @@ export async function loader({ params, request }) {
                     { firstname: { $regex: new RegExp(name, "i") } },
                     { tags: tag },
                     { userType: "candidate" },
+                    { _id: { $ne: userId } },
                   ],
                 },
                 {
@@ -38,6 +44,7 @@ export async function loader({ params, request }) {
                     { lastname: { $regex: new RegExp(name, "i") } },
                     { tags: tag },
                     { userType: "candidate" },
+                    { _id: { $ne: userId } },
                   ],
                 },
               ],
@@ -45,6 +52,7 @@ export async function loader({ params, request }) {
           : {
               tags: tag,
               userType: "candidate",
+              _id: { $ne: userId },
             }
       ).sort({ sort: 1 }),
       allParams: allParams,
@@ -60,17 +68,22 @@ export async function loader({ params, request }) {
                 $and: [
                   { firstname: { $regex: new RegExp(name, "i") } },
                   { userType: "candidate" },
+                  { _id: { $ne: userId } },
                 ],
               },
               {
                 $and: [
                   { lastname: { $regex: new RegExp(name, "i") } },
                   { userType: "candidate" },
+                  { _id: { $ne: userId } },
                 ],
               },
             ],
           }
-        : { userType: "candidate" }
+        : {
+            userType: "candidate",
+            _id: { $ne: userId },
+          }
     ).sort({ sort: 1 }),
     allParams: allParams,
     tags: allTagsArrayUnique,
@@ -164,8 +177,8 @@ export default function Candidates() {
             key={candidate._id}
             className=" bg-white p-4 rounded-xl grow max-w-md shadow-md "
           >
-            <div className="flex">
-              <Link to={`/candidates/${candidate._id}`} className="z-10">
+            <div className="flex gap-2 items-center">
+              <Link to={`/candidates/${candidate._id}`} className="z-10 flex-1">
                 <img
                   src={
                     candidate?.image
@@ -173,36 +186,40 @@ export default function Candidates() {
                       : "/403017_avatar_default_head_person_unknown_icon.png"
                   }
                   alt=""
-                  className="w-24 h-24 rounded-full mr-4"
+                  className="w-full h-auto rounded-full mr-4"
                 />
               </Link>
-              <div>
-                <Link to={`/candidates/${candidate._id}`} className="z-10">
-                  <h2 className="text-xl font-semibold">
-                    {`${candidate.firstname} ${candidate.lastname}`}
-                  </h2>
-                </Link>
-                <Form
-                  method="post"
-                  action="/chat/chat-overview/chat-conversation"
-                >
-                  <button
-                    className=" bg-green-400 p-2 rounded-lg hover:bg-green-300 "
-                    type="submit"
+              <div className=" w-2/3 flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <Link to={`/candidates/${candidate._id}`} className="z-10">
+                    <h2 className="text-xl font-semibold">
+                      {`${candidate.firstname} ${candidate.lastname}`}
+                    </h2>
+                  </Link>
+                  <Form
+                    method="post"
+                    action="/chat/chat-overview/chat-conversation"
                   >
-                    Start chat
-                  </button>
-                  <input
-                    type="hidden"
-                    name="participantId"
-                    value={candidate._id}
-                  />
-                </Form>
+                    <button
+                      className=" bg-green-400 p-2 rounded-full hover:bg-green-300 "
+                      type="submit"
+                      title="Chat with this candidate"
+                    >
+                      <Chat />
+                    </button>
+                    <input
+                      type="hidden"
+                      name="participantId"
+                      value={candidate._id}
+                    />
+                  </Form>
+                </div>
 
                 <ul className="flex gap-2 flex-wrap">
                   {candidate.tags?.map((tag) => (
                     <li key={tag}>
                       <Link
+                        title="View all candidates with this technology"
                         to={`/candidates/tag/${tag}`}
                         className=" bg-green-400 rounded-full px-2 hover:bg-green-300 z-20"
                       >
@@ -217,9 +234,9 @@ export default function Candidates() {
             <div className="pt-2 flex flex-col gap-2">
               <p>
                 {candidate.description &&
-                  candidate.description?.slice(0, 25) + "..."}
+                  candidate.description?.slice(0, 100) + "..."}
               </p>
-              <div className="flex gap-2"></div>
+
               <p className=" text-slate-400 text-sm">
                 {"Created: " +
                   candidate.createdAt.slice(8, 10) +

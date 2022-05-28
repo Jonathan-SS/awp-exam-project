@@ -1,18 +1,21 @@
 import { useLoaderData, Link, Form, useSubmit } from "@remix-run/react";
 import { useState, useEffect } from "react";
+import Chat from "../../../icons/Chat";
 
 import connectDb from "~/db/connectDb.server.js";
 import useJs from "../../../hooks/useJs";
+import { getSession } from "../../../sessions.server";
 
 export async function loader({ params, request }) {
   const db = await connectDb();
+  const cookie = request.headers.get("Cookie");
+  const session = await getSession(cookie);
+  const userId = session.get("userId");
   const url = new URL(request.url);
   const name = url.searchParams.get("name");
   const sort = url.searchParams.get("sort");
   const tag = params.tagName;
   const allParams = { name, tag, sort };
-
-  console.log(name);
 
   return {
     candidates: await db.models.User.find(
@@ -24,6 +27,7 @@ export async function loader({ params, request }) {
                   { firstname: { $regex: new RegExp(name, "i") } },
                   { tags: tag },
                   { userType: "candidate" },
+                  { _id: { $ne: userId } },
                 ],
               },
               {
@@ -31,12 +35,15 @@ export async function loader({ params, request }) {
                   { lastname: { $regex: new RegExp(name, "i") } },
                   { tags: tag },
                   { userType: "candidate" },
+                  { _id: { $ne: userId } },
                 ],
               },
             ],
           }
         : {
             tags: tag,
+            userType: "candidate",
+            _id: { $ne: userId },
           }
     ).sort({ [sort]: -1 }),
     allParams: allParams,
@@ -54,108 +61,128 @@ export default function Tag() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-3">All of our IT cadidates</h1>
-      <div className="flex items-center gap-4">
-        <Form method="get" onChange={handleChange}>
-          <input
-            className=" p-2 rounded-full mr-2"
-            type="search"
-            name="name"
-            placeholder="Search..."
-            defaultValue={allParams.name}
-          />
-          {!hasJs && (
-            <button
-              type="submit"
-              className="  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
+      <h1 className="text-3xl font-bold mb-3">
+        It candidates with: {allParams.tag}
+      </h1>
+      <div>
+        <Form
+          className="grid items-center gap-4 grid-cols-2 md:flex md:items-center"
+          method="get"
+          onChange={handleChange}
+        >
+          <div>
+            <input
+              className=" p-2 rounded-full mr-2"
+              type="search"
+              name="name"
+              placeholder="Search..."
+              defaultValue={allParams.name}
+            />
+            {!hasJs && (
+              <button
+                type="submit"
+                className="  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
+              >
+                Search
+              </button>
+            )}
+          </div>
+          <div className="flex justify-end">
+            <select
+              name="sort"
+              type="sort"
+              className="p-2 rounded-full  md:mr-2  "
+              defaultValue={{ label: allParams.sort, value: allParams.sort }}
             >
-              Search
-            </button>
-          )}
-
-          <select
-            name="sort"
-            type="sort"
-            className="p-2 rounded-full mr-2  "
-            defaultValue={{ label: allParams.sort, value: allParams.sort }}
-          >
-            <option value="">Sort by</option>
-            <option value="firstname">First Name</option>
-            <option value="lastname">Last Name</option>
-            <option value="createdAt">Date</option>
-          </select>
-          {!hasJs && (
-            <button
-              type="submit"
-              className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
-            >
-              Sort
-            </button>
-          )}
-
-          <select
-            name="tag"
-            type="tag"
-            id=""
-            className="p-2 rounded-full mr-2"
-            defaultValue={{ label: allParams.tag, value: allParams.tag }}
-          >
-            <option value="">Technology</option>
-            <option value="WP">WP</option>
-            <option value="vue">Vue</option>
-          </select>
-          {!hasJs && (
-            <button
-              type="submit"
-              className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
-            >
-              Apply
-            </button>
-          )}
+              <option value="">Sort by</option>
+              <option value="firstname">First Name</option>
+              <option value="lastname">Last Name</option>
+              <option value="createdAt">Date</option>
+            </select>
+            {!hasJs && (
+              <button
+                type="submit"
+                className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
+              >
+                Sort
+              </button>
+            )}
+          </div>
         </Form>
       </div>
-      <ul className="flex py-2 pt-4 gap-4 flex-wrap justify-start">
+      <ul className=" py-2 pt-4 gap-4 justify-start grid grid-cols-1 md:grid-cols-3">
         {candidates.map((candidate) => (
           <li
             key={candidate._id}
-            className="w-72 bg-white p-4 rounded-xl grow min-w-xs max-w-xs "
+            className=" bg-white p-4 rounded-xl grow max-w-md shadow-md "
           >
-            <Link to={`/candidates/${candidate._id}`} className="z-10">
-              <div className="flex">
+            <div className="flex gap-2 items-center">
+              <Link to={`/candidates/${candidate._id}`} className="z-10 flex-1">
                 <img
-                  src="/403017_avatar_default_head_person_unknown_icon.png"
+                  src={
+                    candidate?.image
+                      ? `/uploads/${candidate.image.name}`
+                      : "/403017_avatar_default_head_person_unknown_icon.png"
+                  }
                   alt=""
-                  className="w-24 h-24 rounded-full mr-4"
+                  className="w-full h-auto rounded-full mr-4"
                 />
-                <div>
-                  <h2 className="text-xl font-semibold">
-                    {`${candidate.firstname} ${candidate.lastname}`}
-                  </h2>
-                  <div className="flex gap-2 flex-wrap">
-                    {candidate.tags?.map((tag) => (
+              </Link>
+              <div className=" w-2/3 flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <Link to={`/candidates/${candidate._id}`} className="z-10">
+                    <h2 className="text-xl font-semibold">
+                      {`${candidate.firstname} ${candidate.lastname}`}
+                    </h2>
+                  </Link>
+                  <Form
+                    method="post"
+                    action="/chat/chat-overview/chat-conversation"
+                  >
+                    <button
+                      className=" bg-green-400 p-2 rounded-full hover:bg-green-300 "
+                      type="submit"
+                      title="Chat with this candidate"
+                    >
+                      <Chat />
+                    </button>
+                    <input
+                      type="hidden"
+                      name="participantId"
+                      value={candidate._id}
+                    />
+                  </Form>
+                </div>
+
+                <ul className="flex gap-2 flex-wrap">
+                  {candidate.tags?.map((tag) => (
+                    <li key={tag}>
                       <Link
-                        key={tag}
+                        title="View all candidates with this technology"
                         to={`/candidates/tag/${tag}`}
                         className=" bg-green-400 rounded-full px-2 hover:bg-green-300 z-20"
                       >
                         {tag}
                       </Link>
-                    ))}
-                  </div>
-                </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
+            </div>
 
-              <div className="pt-2 flex flex-col gap-2">
-                <p>{candidate.description}</p>
-                <div className="flex gap-2"></div>
-                <p className=" text-slate-400 text-sm">
-                  {"Created: " +
-                    candidate.createdAt.slice(8, 10) +
-                    candidate.createdAt.slice(4, 8) +
-                    candidate.createdAt.slice(0, 4)}
-                </p>
-              </div>
-            </Link>
+            <div className="pt-2 flex flex-col gap-2">
+              <p>
+                {candidate.description &&
+                  candidate.description?.slice(0, 100) + "..."}
+              </p>
+
+              <p className=" text-slate-400 text-sm">
+                {"Created: " +
+                  candidate.createdAt.slice(8, 10) +
+                  candidate.createdAt.slice(4, 8) +
+                  candidate.createdAt.slice(0, 4)}
+              </p>
+            </div>
           </li>
         ))}
       </ul>

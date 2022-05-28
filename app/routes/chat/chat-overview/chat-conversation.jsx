@@ -9,7 +9,7 @@ export async function action({ request }) {
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);
   const userId = session.get("userId");
-  const chatId = form.get("chatId");
+  let chatId = form.get("chatId");
   const user = await db.models.User.findById(userId);
   const participant = await db.models.User.findById(form.get("participantId"));
   let chat = {};
@@ -31,8 +31,8 @@ export async function action({ request }) {
     );
   }
 
-  function exsistingChatCheck(userId, participantId) {
-    return db.models.Chat.findOne({
+  async function exsistingChatCheck(userId, participantId) {
+    return await db.models.Chat.findOne({
       $and: [
         {
           participants: {
@@ -49,6 +49,7 @@ export async function action({ request }) {
   }
 
   if (chatId) {
+    console.log("vi er her ", chatId);
     chat = await db.models.Chat.findOne({
       _id: chatId,
     });
@@ -58,14 +59,14 @@ export async function action({ request }) {
       chat = await db.models.Chat.findOne({
         _id: chatId,
       });
+      console.log("chat", chat);
       return chat;
     });
   } else {
     chat = await exsistingChatCheck(userId, form.get("participantId"));
   }
-  console.log("chat", chat);
 
-  if (chat === null) {
+  if (!chat) {
     chat = await db.models.Chat.create({
       participants: [
         {
@@ -84,6 +85,7 @@ export async function action({ request }) {
         },
       ],
     });
+    chatId = chat._id;
   }
 
   return { chat, chatId, user, participant };

@@ -110,7 +110,7 @@ export default function Profile() {
           <h2 className="text-xl font-semibold">{`${user?.firstname} ${user?.lastname}`}</h2>
           <div>
             <h3 className=" font-semibold text-lg">Bio</h3>
-            <p>
+            <p className=" break-words">
               {user?.description
                 ? user.description
                 : " Looks like you haven't added a description to your profile. Go To Edit profile to add one."}
@@ -119,7 +119,7 @@ export default function Profile() {
 
           <div>
             <h3 className=" font-semibold text-lg">Links</h3>
-            <div>
+            <div className="grid grid-cols-1">
               {user.links.length > 0
                 ? user.links?.map((link) => (
                     <a
@@ -127,6 +127,7 @@ export default function Profile() {
                       rel="noreferrer"
                       target="_blank"
                       href={link.url}
+                      className="text-blue-500 hover:text-blue-700 underline"
                     >
                       {link.name}
                     </a>
@@ -137,15 +138,16 @@ export default function Profile() {
 
           <div>
             <h3 className=" font-semibold text-lg">Tags</h3>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               {user.tags.length > 0
                 ? user.tags?.map((tag) => (
-                    <p
+                    <Link
                       key={tag}
+                      to={`/candidates/tag/${tag}`}
                       className=" bg-green-400 rounded-full px-2 hover:bg-green-300"
                     >
                       {tag}
-                    </p>
+                    </Link>
                   ))
                 : " Looks like you haven't added any tags to your profile. Go To Edit profile to add some."}
             </div>
