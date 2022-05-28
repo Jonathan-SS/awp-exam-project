@@ -9,7 +9,7 @@ import {
   useLoaderData,
 } from "@remix-run/react";
 import { useEffect, useState } from "react";
-
+import connectDb from "~/db/connectDb.server.js";
 import styles from "~/tailwind.css";
 import MenuItem from "./components/MenuItem";
 
@@ -27,11 +27,13 @@ import Chat from "./icons/Chat";
 import { getSession } from "./sessions.server";
 import { Link } from "react-router-dom";
 import Bug from "./illustrations/Bug";
+import ChatIcon from "./components/chatIcon";
 
 export const links = () => [
   {
     rel: "stylesheet",
     href: styles,
+    as: "style",
   },
   {
     rel: "apple-touch-icon",
@@ -73,29 +75,41 @@ export function meta() {
 }
 
 export async function loader({ request }) {
+  const db = await connectDb();
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);
+  // TODO: find a way to do this
+  const chatMessages = await db.models.Chat.find({
+    $elemmatch: {
+      participants: {
+        $and: [{ userId: session.get("userId") }, { hasread: false }],
+      },
+    },
+  });
+
+  console.log(chatMessages.length);
 
   if (session.has("userId")) {
-    return true;
+    return { loggedIn: true, messages: chatMessages };
   }
-  return false;
+
+  return { loggedIn: false, messages: chatMessages };
 }
 
 export default function App() {
-  const status = useLoaderData();
+  const { loggedIn, messages } = useLoaderData();
   const [loggedin, setLoggedin] = useState(false);
-
+  //TODO: add dark mode style
   useEffect(() => {
     //checks if the user prefers dark mode
     if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
       document.documentElement.classList.add("dark");
     }
-    setLoggedin(status);
-  }, [status]);
+    setLoggedin(loggedIn);
+  }, [loggedIn]);
 
   return (
-    <Layout loggedin={loggedin}>
+    <Layout messages={messages} loggedin={loggedin}>
       <Outlet />
     </Layout>
   );
@@ -103,7 +117,7 @@ export default function App() {
 
 export function Layout({ children, ...rest }) {
   const [navIsOpen, setNavIsOpen] = useState(false);
-  const { loggedin } = rest;
+  const { loggedin, messages } = rest;
   function showMobileMenu() {
     const menu = document.getElementById("menu");
     menu.classList.toggle("hidden");
@@ -157,11 +171,12 @@ export function Layout({ children, ...rest }) {
                 label="Profile"
                 to="/profile"
               />
-              <MenuItem
+              <ChatIcon
                 icon={<Chat />}
                 onClick={showMobileMenu}
                 label="Chat"
                 to="/chat/chat-overview"
+                messages={messages}
               />
             </>
           ) : null}
@@ -255,6 +270,6 @@ export function ErrorBoundary({ error }) {
 }
 //TODOne add catch and ERROR boundry to everything
 //TODOne add a 404 page
-//TODO make it work on mobile
+//TODOne make it work on mobile
 // TODOne: find a way to check if the user is logged in for the Navbar
 //TODO: add ability to report bugs maybe?

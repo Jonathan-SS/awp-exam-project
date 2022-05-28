@@ -84,10 +84,6 @@ const postsSchema = new Schema(
 
 const chatSchema = new Schema(
   {
-    test: {
-      type: String,
-      default: "test333",
-    },
     participants: [
       {
         userId: {
@@ -139,7 +135,7 @@ const chatSchema = new Schema(
   { timestamps: true }
 );
 
-//TODO: nake only one schema for all users
+//TODOne: nake only one schema for all users
 
 export const models = [
   {

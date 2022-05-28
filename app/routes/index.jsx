@@ -23,7 +23,7 @@ export async function loader({ request }) {
 export default function Index() {
   const { posts, jobPosts, candidates } = useLoaderData();
 
-  //TODO make cool welcomming page
+  //TODOne make cool welcomming page
   return (
     <>
       <h1 className=" mb-4  font-bold text-2xl md:text-4xl">
@@ -103,7 +103,7 @@ export default function Index() {
                       </h2>
                     </Link>
 
-                    <ul className="flex gap-2 flex-wrap">
+                    <ul className="flex gap-2 flex-wrap align">
                       {candidate.tags?.map((tag) => (
                         <li key={tag}>
                           <Link

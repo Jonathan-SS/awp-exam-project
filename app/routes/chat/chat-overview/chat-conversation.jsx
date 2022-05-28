@@ -1,4 +1,9 @@
-import { Form, useActionData, useTransition } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useTransition,
+  useFetcher,
+} from "@remix-run/react";
 import { useState, useEffect } from "react";
 import connectDb from "~/db/connectDb.server";
 import { getSession } from "../../../sessions.server";
@@ -91,11 +96,33 @@ export async function action({ request }) {
   return { chat, chatId, user, participant };
 }
 
+export async function loader({ request }) {
+  const db = await connectDb();
+  console.log(request);
+  const url = new URL(request.url);
+  const chatId = url.searchParams.get("chatId");
+  console.log("this is it", chatId);
+
+  if (
+    chatId !== "unknown" &&
+    chatId !== "" &&
+    chatId !== null &&
+    chatId !== "undefined"
+  ) {
+    console.log("chatId", chatId);
+    return await db.models.Chat.findOne({
+      _id: chatId,
+    });
+  }
+
+  return null;
+}
+
 export default function ChatConversation() {
   const actionData = useActionData();
-
+  const fetcher = useFetcher();
   let transition = useTransition();
-  const [chatId, setChatId] = useState("NA");
+  const [chatId, setChatId] = useState();
   const [chat, setChat] = useState({});
   const [user, setUser] = useState({});
   const [participant, setParticipant] = useState({});
@@ -116,10 +143,36 @@ export default function ChatConversation() {
     setUser(actionData?.user);
   }, [actionData?.chatId, actionData?.participant, actionData?.user]);
 
-  console.log("chat", chat);
-  console.log("chatId", chatId);
-  console.log("user", user);
-  console.log("participant", participant);
+  //https://benborgers.com/posts/remix-poll
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (
+        document.visibilityState === "visible" &&
+        chatId !== "unknown" &&
+        chatId !== "" &&
+        chatId !== null &&
+        chatId !== "undefined" &&
+        chatId !== undefined
+      ) {
+        fetcher.submit(
+          {
+            chatId: chatId,
+          },
+          {
+            method: "get",
+          }
+        );
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  });
+
+  useEffect(() => {
+    if (fetcher.data) {
+      setChat(fetcher.data);
+    }
+  }, [fetcher.data]);
 
   return (
     <div
@@ -150,10 +203,10 @@ export default function ChatConversation() {
                       src={
                         user._id === message.sender
                           ? user?.image?.name
-                            ? user.image.name
+                            ? `/uploads/${user.image.name}`
                             : "/403017_avatar_default_head_person_unknown_icon.png"
                           : participant?.image?.name
-                          ? participant.image.name
+                          ? `/uploads/${participant.image.name}`
                           : "/403017_avatar_default_head_person_unknown_icon.png"
                       }
                       alt=""
@@ -165,7 +218,7 @@ export default function ChatConversation() {
                           "min-h-full p-2 rounded-lg" +
                           (user._id === message.sender
                             ? " bg-green-400 mr-2 "
-                            : "bg-slate-100 ml-2 ")
+                            : " bg-slate-100 ml-2 ")
                         }
                       >
                         {message.message}
@@ -189,7 +242,11 @@ export default function ChatConversation() {
               placeholder="Message..."
             />
             <input type="hidden" name="_action" value="sendMessage" />
-            <input type="hidden" name="chatId" value={chatId} />
+            <input
+              type="hidden"
+              name="chatId"
+              value={chatId ? chatId : "unknown"}
+            />
             <input type="hidden" name="participantId" value={participant._id} />
 
             <button
