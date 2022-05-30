@@ -8,6 +8,13 @@ This repo has been initialized with a [mongoose-remix "custom stack" template][c
 - Create user/login/logout
 - Chat functionality
 
+# Test users
+
+### Dan Okkels
+
+- Email: dan@email.com
+- Password: 12345678
+
 # Technology stack for this project
 
 - [React][react]
