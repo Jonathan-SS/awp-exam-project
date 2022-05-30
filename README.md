@@ -2,6 +2,12 @@
 
 This repo has been initialized with a [mongoose-remix "custom stack" template][custom-stack]. A prototype wil be deployed at my [Heroku][heroku] account, and wil be avalible at [this link][prototype-link].
 
+# Features of the project
+
+- CRUD functionality(Posts, Job posts)
+- Create user/login/logout
+- Chat functionality
+
 # Technology stack for this project
 
 - [React][react]
@@ -10,7 +16,7 @@ This repo has been initialized with a [mongoose-remix "custom stack" template][c
 - [MongoDB][mongodb]
 - [Mongoose][mongoose]
 
-[prototype-link]: https://exam-test-app.herokuapp.com/
+[prototype-link]: https://cnnect-app.herokuapp.com
 [tailwindcss]: https://tailwindcss.com
 [mongodb]: https://www.mongodb.com/atlas
 [heroku]: https://www.heroku.com
