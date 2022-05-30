@@ -1,6 +1,7 @@
 import { Form, Link } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
 import connectDb from "~/db/connectDb.server.js";
+import seedUsers from "~/seed/users.json";
 
 export async function loader() {
   const db = await connectDb();
@@ -19,8 +20,9 @@ export async function action({ request }) {
   const _action = form.get("_action");
   if (_action === "seed") {
     try {
-      await db.models.Snippet.insertMany("seedData");
-      return redirect("/snippets/all");
+      await db.models.User.insertMany(seedUsers);
+
+      return redirect("/");
     } catch (error) {
       throw error;
     }
@@ -39,7 +41,7 @@ export default function Seed() {
           <Link to="/snippets/all">
             <button
               to="/snippets/all"
-              className="text-xl text-white bg-red-600 hover:bg-red-800 rounded-lg px-4 py-2"
+              className="text-xl text-white bg-red-500 hover:bg-red-400 shadow-md rounded-lg px-4 py-2"
             >
               No!!😡
             </button>
@@ -50,9 +52,9 @@ export default function Seed() {
               name="_action"
               value="seed"
               type="submit"
-              className="text-xl text-white hover:bg-green-800 bg-green-600 rounded-lg px-4 py-2"
+              className="text-xl text-white shadow-md hover:bg-green-300 bg-green-400 rounded-lg px-4 py-2"
             >
-              Yes please boss😇
+              Yes please!
             </button>
           </Form>
         </div>

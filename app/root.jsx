@@ -85,7 +85,7 @@ export async function loader({ request }) {
     _id: 0,
   });
   let unRead = 0;
-  // TODO: find a way to do this
+
   const chatMessages = await db.models.Chat.find({
     $elemmatch: {
       participants: {

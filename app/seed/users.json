@@ -1,0 +1,60 @@
+[
+  {
+    "firstname": "Jonathan",
+    "lastname": "Skovmose",
+    "userType": "candidate",
+    "email": "jonathanstensgaard@gmail.com",
+    "password": "$2a$10$E88y.13vWUbm3FcWRHga4OJcsQiWk8I68zML.kc1q7wiT.CxS7vx2",
+    "tags": ["React", "Remix", "WordPress", "MongoDb", "TailwindCSS"],
+    "savedCandidates": [],
+    "links": [
+      {
+        "name": "Facebook",
+        "url": "https://www.facebook.com/jonathan.skovmose/\r"
+      },
+      {
+        "name": "LinkedIn",
+        "url": "https://www.linkedin.com/in/jonathan-stensgaard-skovmose-09652a192/"
+      }
+    ],
+
+    "description": "I'm an aspiring web development student looking for a cool job",
+    "linksAsText": "Facebook;https://www.facebook.com/jonathan.skovmose/\r\nLinkedIn;https://www.linkedin.com/in/jonathan-stensgaard-skovmose-09652a192/"
+  },
+  {
+    "firstname": "Camilla",
+    "lastname": "Lousdal",
+    "userType": "candidate",
+    "email": "camilla@email.com",
+    "password": "$2a$10$JjY0K5UOiBOb8WT9.PC.Y.MhRE2XuU4oGrngutLcfJHT1XnB.hr3u",
+    "tags": ["Illustrator", "Photoshop", "Procreate", "Figma"],
+    "savedCandidates": [],
+    "links": [
+      {
+        "name": "LinkedIn",
+        "url": "https://www.linkedin.com/"
+      }
+    ],
+
+    "description": "I'm an aspiring content creator looking for a cool job in marketing.",
+    "linksAsText": "LinkedIn;https://www.linkedin.com/"
+  },
+  {
+    "firstname": "Jens",
+    "lastname": "Hansen",
+    "userType": "recruiter",
+    "email": "jens@email.com",
+    "password": "$2a$10$Tez3zPuFSd6WzCAL9POchOgW59g1IkWP.BFokcyYDjV9wUA9rwlce",
+    "tags": ["WordPress", "React", "CSS"],
+    "savedCandidates": [],
+    "links": [
+      {
+        "name": "Dummy company",
+        "url": "https://www.google.com/"
+      }
+    ],
+
+    "description": "I'm a recruiter from a fake dummy web company",
+    "linksAsText": "Dummy company;https://www.google.com/"
+  }
+]
