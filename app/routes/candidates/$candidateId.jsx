@@ -10,7 +10,7 @@ export async function loader({ request, params }) {
   const user = await db.models.User.findById(userId);
   const posts = [];
   const postIds = user.get("posts");
-  for (let i = 0; i < postIds.length; i++) {
+  for (let i = 0; i < postIds?.length; i++) {
     const post = await db.models.Post.findById(postIds[i]);
     posts.push(post);
   }
@@ -68,7 +68,7 @@ export default function Profile() {
           <div>
             <h3 className=" font-semibold text-lg">Tags</h3>
             <div className="flex gap-2">
-              {user.tags.length > 0
+              {user.tags?.length > 0
                 ? user.tags?.map((tag) => (
                     <p
                       key={tag}

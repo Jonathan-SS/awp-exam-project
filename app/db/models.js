@@ -56,6 +56,14 @@ const userSchema = new Schema(
     linksAsText: {
       type: String,
     },
+    savedCandidates: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Candidate",
+        },
+      ],
+    },
   },
   { timestamps: true }
 );

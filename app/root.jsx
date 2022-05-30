@@ -29,6 +29,8 @@ import { Link } from "react-router-dom";
 import Bug from "./illustrations/Bug";
 import ChatIcon from "./components/chatIcon";
 
+import BookMark from "./icons/BookMark";
+
 export const links = () => [
   {
     rel: "stylesheet",
@@ -78,11 +80,16 @@ export async function loader({ request }) {
   const db = await connectDb();
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);
+  const userId = session.get("userId");
+  const userType = await db.models.User.findById(userId).select({
+    userType: 1,
+    _id: 0,
+  });
   // TODO: find a way to do this
   const chatMessages = await db.models.Chat.find({
     $elemmatch: {
       participants: {
-        $and: [{ userId: session.get("userId") }, { hasread: false }],
+        $and: [{ userId: userId }, { hasread: false }],
       },
     },
   });
@@ -90,15 +97,20 @@ export async function loader({ request }) {
   console.log(chatMessages.length);
 
   if (session.has("userId")) {
-    return { loggedIn: true, messages: chatMessages };
+    return {
+      loggedIn: true,
+      messages: chatMessages,
+      userType: userType.userType,
+    };
   }
 
-  return { loggedIn: false, messages: chatMessages };
+  return { loggedIn: false, messages: chatMessages, userType };
 }
 
 export default function App() {
-  const { loggedIn, messages } = useLoaderData();
+  const { loggedIn, messages, userType } = useLoaderData();
   const [loggedin, setLoggedin] = useState(false);
+
   //TODO: add dark mode style
   useEffect(() => {
     //checks if the user prefers dark mode
@@ -109,7 +121,7 @@ export default function App() {
   }, [loggedIn]);
 
   return (
-    <Layout messages={messages} loggedin={loggedin}>
+    <Layout messages={messages} loggedin={loggedin} userType={userType}>
       <Outlet />
     </Layout>
   );
@@ -117,7 +129,7 @@ export default function App() {
 
 export function Layout({ children, ...rest }) {
   const [navIsOpen, setNavIsOpen] = useState(false);
-  const { loggedin, messages } = rest;
+  const { loggedin, messages, userType } = rest;
   function showMobileMenu() {
     const menu = document.getElementById("menu");
     menu.classList.toggle("hidden");
@@ -179,6 +191,15 @@ export function Layout({ children, ...rest }) {
                 messages={messages}
               />
             </>
+          ) : null}
+
+          {userType === "recruiter" ? (
+            <MenuItem
+              icon={<BookMark menuItem={true} />}
+              onClick={showMobileMenu}
+              label="Saved candidates"
+              to="/saved-candidates"
+            />
           ) : null}
 
           {!loggedin ? (
@@ -268,8 +289,4 @@ export function ErrorBoundary({ error }) {
     </Layout>
   );
 }
-//TODOne add catch and ERROR boundry to everything
-//TODOne add a 404 page
-//TODOne make it work on mobile
-// TODOne: find a way to check if the user is logged in for the Navbar
 //TODO: add ability to report bugs maybe?

@@ -14,4 +14,3 @@ export async function requireSession(request) {
 
   return session;
 }
-//TODOne fix requireSession som ot doesn't crash site

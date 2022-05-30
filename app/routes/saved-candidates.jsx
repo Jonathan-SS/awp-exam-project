@@ -2,10 +2,10 @@ import { useLoaderData, Link, Form, useSubmit } from "@remix-run/react";
 import { useState, useEffect } from "react";
 
 import connectDb from "~/db/connectDb.server.js";
-import useJs from "../../hooks/useJs";
-import BookMark from "../../icons/BookMark";
-import Chat from "../../icons/Chat";
-import { getSession, requireSession } from "../../sessions.server";
+import useJs from "../hooks/useJs";
+import BookMark from "../icons/BookMark";
+import Chat from "../icons/Chat";
+import { getSession, requireSession } from "../sessions.server";
 
 export async function loader({ params, request }) {
   requireSession(request);
@@ -25,7 +25,9 @@ export async function loader({ params, request }) {
   );
   const user = await db.models.User.findById(userId);
   const userType = user.userType;
+  console.log(userType);
   const savedIds = user.savedCandidates;
+  console.log(savedIds);
 
   if (tag) {
     return {
@@ -38,7 +40,7 @@ export async function loader({ params, request }) {
                     { firstname: { $regex: new RegExp(name, "i") } },
                     { tags: tag },
                     { userType: "candidate" },
-                    { _id: { $ne: userId } },
+                    { _id: { $in: savedIds } },
                   ],
                 },
                 {
@@ -46,7 +48,7 @@ export async function loader({ params, request }) {
                     { lastname: { $regex: new RegExp(name, "i") } },
                     { tags: tag },
                     { userType: "candidate" },
-                    { _id: { $ne: userId } },
+                    { _id: { $in: savedIds } },
                   ],
                 },
               ],
@@ -54,9 +56,9 @@ export async function loader({ params, request }) {
           : {
               tags: tag,
               userType: "candidate",
-              _id: { $ne: userId },
+              _id: { $in: savedIds },
             }
-      ).sort({ sort: 1 }),
+      ),
       allParams: allParams,
       tags: allTagsArrayUnique,
       userType: userType,
@@ -72,23 +74,23 @@ export async function loader({ params, request }) {
                 $and: [
                   { firstname: { $regex: new RegExp(name, "i") } },
                   { userType: "candidate" },
-                  { _id: { $ne: userId } },
+                  { _id: { $in: savedIds } },
                 ],
               },
               {
                 $and: [
                   { lastname: { $regex: new RegExp(name, "i") } },
                   { userType: "candidate" },
-                  { _id: { $ne: userId } },
+                  { _id: { $in: savedIds } },
                 ],
               },
             ],
           }
         : {
             userType: "candidate",
-            _id: { $ne: userId },
+            _id: { $in: savedIds },
           }
-    ).sort({ sort: 1 }),
+    ),
     allParams: allParams,
     tags: allTagsArrayUnique,
     userType: userType,
@@ -123,7 +125,7 @@ export async function action({ request }) {
   }
 }
 
-export default function Candidates() {
+export default function SavedCandidates() {
   const submit = useSubmit();
 
   const hasJs = useJs();
@@ -154,27 +156,6 @@ export default function Candidates() {
                 className="  bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
               >
                 Search
-              </button>
-            )}
-          </div>
-          <div className="flex justify-end">
-            <select
-              name="sort"
-              type="sort"
-              className="p-2 rounded-full  md:mr-2  "
-              defaultValue={{ label: allParams.sort, value: allParams.sort }}
-            >
-              <option value="">Sort by</option>
-              <option value="firstname">First Name</option>
-              <option value="lastname">Last Name</option>
-              <option value="createdAt">Date</option>
-            </select>
-            {!hasJs && (
-              <button
-                type="submit"
-                className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
-              >
-                Sort
               </button>
             )}
           </div>
