@@ -30,9 +30,20 @@ export async function action({ request }) {
           messages: {
             sender: userId,
             message,
-            createdAt: new Date(),
           },
         },
+      }
+    );
+    await db.models.Chat.updateOne(
+      {
+        _id: chatId,
+
+        "participants.userId": {
+          $ne: userId,
+        },
+      },
+      {
+        $set: { "participants.$.hasRead": false },
       }
     );
   }

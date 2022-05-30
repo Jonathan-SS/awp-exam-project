@@ -10,6 +10,8 @@ export async function loader({ params, request }) {
   const body = url.searchParams.get("body");
   const sort = url.searchParams.get("sort");
   const allParams = { body, sort };
+  
+
 
   return {
     jobPosts: await db.models.Post.find(
