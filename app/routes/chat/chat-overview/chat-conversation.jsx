@@ -245,7 +245,7 @@ export default function ChatConversation() {
             ) : (
               <div className=" -mb-2 w-1/2 px-2">
                 <p className="min-h-full rounded-lg text-slate-400">
-                  No message yet, be the first to reach out.bla
+                  No message yet, be the first to reach out.
                 </p>
               </div>
             )}
