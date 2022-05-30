@@ -1,6 +1,5 @@
-import { useLoaderData, Link, Form, useSubmit } from "@remix-run/react";
-import { useState, useEffect } from "react";
-
+import { Form, useLoaderData, useSubmit } from "@remix-run/react";
+import { Link } from "react-router-dom";
 import connectDb from "~/db/connectDb.server.js";
 import useJs from "../../hooks/useJs";
 import BookMark from "../../icons/BookMark";
@@ -8,7 +7,6 @@ import Chat from "../../icons/Chat";
 import { getSession, requireSession } from "../../sessions.server";
 
 export async function loader({ params, request }) {
-  requireSession(request);
   const db = await connectDb();
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);
@@ -24,8 +22,8 @@ export async function loader({ params, request }) {
     a.localeCompare(b)
   );
   const user = await db.models.User.findById(userId);
-  const userType = user.userType;
-  const savedIds = user.savedCandidates;
+  const userType = user?.userType;
+  const savedIds = user?.savedCandidates;
 
   if (tag) {
     return {

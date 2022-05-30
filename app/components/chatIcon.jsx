@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 
-export default function ChatIcon({ icon, label, to, onClick, messages }) {
+export default function ChatIcon({ icon, label, to, onClick, unRead }) {
+  console.log("unRead", unRead);
   function showToolTip(item) {
     const tooltip = document.getElementById(`${item}-ToolTip`);
 
@@ -29,9 +30,9 @@ export default function ChatIcon({ icon, label, to, onClick, messages }) {
       onClick={onClick}
     >
       {icon}
-      {Number(messages) > 0 && (
+      {Number(unRead) > 0 && (
         <p className=" absolute bg-green-400 w-4 h-4 rounded-full flex text-center  justify-center text-xs top-0 right-0  ">
-          {messages}
+          {unRead}
         </p>
       )}
 

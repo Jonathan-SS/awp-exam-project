@@ -79,19 +79,28 @@ export async function action({ request }) {
           name: `${user.firstname} ${user.lastname}`,
           image: user.image?.name
             ? user.image.name
-            : "403017_avatar_default_head_person_unknown_icon-1653151654690.png",
+            : "403017_avatar_default_head_person_unknown_icon.png",
         },
         {
           userId: participant._id,
           name: `${participant.firstname} ${participant.lastname}`,
           image: participant.image
             ? participant.image.name
-            : "403017_avatar_default_head_person_unknown_icon-1653151654690.png",
+            : "403017_avatar_default_head_person_unknown_icon.png",
         },
       ],
     });
     chatId = chat._id;
   }
+  await db.models.Chat.updateOne(
+    {
+      _id: chatId,
+      "participants.userId": userId,
+    },
+    {
+      $set: { "participants.$.hasRead": true },
+    }
+  );
 
   return { chat, chatId, user, participant };
 }

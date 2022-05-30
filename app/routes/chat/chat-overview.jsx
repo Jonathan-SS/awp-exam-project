@@ -64,6 +64,8 @@ export default function Chat() {
     });
   });
 
+  console.log(chats);
+
   return (
     <div className="flex flex-col md:flex-row gap-4 h-screen -my-8 py-8 ">
       <div className="bg-white p-4 rounded-xl shadow-md h-1/2 md:h-full w-full md:w-80 flex flex-col gap-2  scrollbar:hidden">

@@ -35,7 +35,6 @@ export const links = () => [
   {
     rel: "stylesheet",
     href: styles,
-    as: "style",
   },
   {
     rel: "apple-touch-icon",
@@ -85,31 +84,44 @@ export async function loader({ request }) {
     userType: 1,
     _id: 0,
   });
+  let unRead = 0;
   // TODO: find a way to do this
   const chatMessages = await db.models.Chat.find({
     $elemmatch: {
       participants: {
-        $and: [{ userId: userId }, { hasread: false }],
+        userId: userId,
       },
     },
-  });
+  }).select({ participants: 1 });
 
-  console.log(chatMessages.length);
+  chatMessages.forEach((chat) => {
+    const thisUserInfo = chat.participants.filter(
+      (participant) => participant.userId == userId
+    );
+    console.log(thisUserInfo[0].hasRead);
+    if (thisUserInfo[0]?.hasRead === false) {
+      console.log("Der er en unread");
+      unRead += 1;
+    }
+  });
+  console.log("herherher", unRead);
 
   if (session.has("userId")) {
     return {
       loggedIn: true,
       messages: chatMessages,
       userType: userType.userType,
+      unRead,
     };
   }
 
-  return { loggedIn: false, messages: chatMessages, userType };
+  return { loggedIn: false, messages: chatMessages, userType, unRead };
 }
 
 export default function App() {
-  const { loggedIn, messages, userType } = useLoaderData();
+  const { loggedIn, userType, unRead } = useLoaderData();
   const [loggedin, setLoggedin] = useState(false);
+  console.log(unRead);
 
   //TODO: add dark mode style
   useEffect(() => {
@@ -121,7 +133,7 @@ export default function App() {
   }, [loggedIn]);
 
   return (
-    <Layout messages={messages} loggedin={loggedin} userType={userType}>
+    <Layout unRead={unRead} loggedin={loggedin} userType={userType}>
       <Outlet />
     </Layout>
   );
@@ -129,7 +141,7 @@ export default function App() {
 
 export function Layout({ children, ...rest }) {
   const [navIsOpen, setNavIsOpen] = useState(false);
-  const { loggedin, messages, userType } = rest;
+  const { loggedin, userType, unRead } = rest;
   function showMobileMenu() {
     const menu = document.getElementById("menu");
     menu.classList.toggle("hidden");
@@ -188,7 +200,7 @@ export function Layout({ children, ...rest }) {
                 onClick={showMobileMenu}
                 label="Chat"
                 to="/chat/chat-overview"
-                messages={messages}
+                unRead={unRead}
               />
             </>
           ) : null}

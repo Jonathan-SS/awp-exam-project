@@ -223,12 +223,57 @@ export default function Profile() {
             key={post._id}
             className="bg-white p-6 rounded-xl shadow-md h-100 h1"
           >
-            <div className="rounded-lg relative">
-              <div className=" h1:text-3xl">
-                <Markdown>{post.body}</Markdown>
-                <Link to={`/candidates/${post.user.userId}`}>
-                  <p className="text-slate-400">{`Candidate: ${post.user.userName}`}</p>
-                </Link>
+            <div className="rounded-lg relative hover:text-2xl ">
+              <div className="">
+                <Markdown
+                  options={{
+                    overrides: {
+                      h1: {
+                        props: {
+                          style: {
+                            fontSize: "1.75rem",
+                            lineHeight: "2rem",
+                            fontWeight: "600",
+                          },
+                        },
+                      },
+                      h2: {
+                        props: {
+                          style: {
+                            fontSize: "1.5rem",
+                            lineHeight: "1.75rem",
+                            fontWeight: "500",
+                          },
+                        },
+                      },
+                      h3: {
+                        props: {
+                          style: {
+                            fontSize: "1.25rem",
+                            lineHeight: "1.5rem",
+                            fontWeight: "500",
+                          },
+                        },
+                      },
+                      img: {
+                        props: {
+                          className: "shadow-md rounded-lg",
+                        },
+                      },
+                      a: {
+                        props: {
+                          className: "prose",
+                          style: {
+                            textDecoration: "underline",
+                            color: "#2563eb",
+                          },
+                        },
+                      },
+                    },
+                  }}
+                >
+                  {post.body}
+                </Markdown>
 
                 <p className="text-slate-400">
                   {user

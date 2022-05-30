@@ -93,7 +93,55 @@ export default function Candidates() {
             key={jobPost._id}
             className=" bg-white p-4 rounded-xl grow max-w-md shadow-md "
           >
-            <Markdown>{jobPost.body}</Markdown>
+            <Markdown
+              options={{
+                overrides: {
+                  h1: {
+                    props: {
+                      style: {
+                        fontSize: "1.75rem",
+                        lineHeight: "2rem",
+                        fontWeight: "600",
+                      },
+                    },
+                  },
+                  h2: {
+                    props: {
+                      style: {
+                        fontSize: "1.5rem",
+                        lineHeight: "1.75rem",
+                        fontWeight: "500",
+                      },
+                    },
+                  },
+                  h3: {
+                    props: {
+                      style: {
+                        fontSize: "1.25rem",
+                        lineHeight: "1.5rem",
+                        fontWeight: "500",
+                      },
+                    },
+                  },
+                  img: {
+                    props: {
+                      className: "shadow-md rounded-lg",
+                    },
+                  },
+                  a: {
+                    props: {
+                      className: "prose",
+                      style: {
+                        textDecoration: "underline",
+                        color: "#2563eb",
+                      },
+                    },
+                  },
+                },
+              }}
+            >
+              {jobPost.body}
+            </Markdown>
             <div>
               <p className=" text-slate-400 text-sm">
                 {"Created: " +

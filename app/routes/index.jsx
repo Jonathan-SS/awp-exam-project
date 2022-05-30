@@ -5,9 +5,21 @@ import Markdown from "markdown-to-jsx";
 
 export async function loader({ request }) {
   const db = await connectDb();
+  const url = new URL(request.url);
+  let page = url.searchParams.get("p");
+  if (!page) {
+    page = 1;
+  }
+  console.log("herunder");
+  console.log(page);
   const posts = await db.models.Post.find({
     postType: "post",
-  });
+  })
+    .limit(3)
+    .skip(3 * (page - 1))
+    .sort({ createdAt: -1 });
+  const totalPages = await db.models.Post.countDocuments({ postType: "post" });
+  console.log(totalPages);
   const jobPosts = await db.models.Post.find({
     postType: "jobPost",
   }).limit(4);
@@ -17,11 +29,11 @@ export async function loader({ request }) {
 
   console.log(candidates);
 
-  return { posts, jobPosts, candidates };
+  return { posts, jobPosts, candidates, totalPages };
 }
 
 export default function Index() {
-  const { posts, jobPosts, candidates } = useLoaderData();
+  const { posts, jobPosts, candidates, totalPages } = useLoaderData();
 
   //TODOne make cool welcomming page
   return (
@@ -38,7 +50,55 @@ export default function Index() {
                   className=" h1:text-2xl h1:font-bold h1:mb-4 h2:mb-2 h2:text-xl h2:font-semibold h3:text-lg h3:font-semibold h4:text-md h4:font-semibold img:max-h-64 img:shadow-md img:rounded-lg img:mb-2"
                   id="markdownStyle"
                 >
-                  <Markdown>{post.body}</Markdown>
+                  <Markdown
+                    options={{
+                      overrides: {
+                        h1: {
+                          props: {
+                            style: {
+                              fontSize: "1.75rem",
+                              lineHeight: "2rem",
+                              fontWeight: "600",
+                            },
+                          },
+                        },
+                        h2: {
+                          props: {
+                            style: {
+                              fontSize: "1.5rem",
+                              lineHeight: "1.75rem",
+                              fontWeight: "500",
+                            },
+                          },
+                        },
+                        h3: {
+                          props: {
+                            style: {
+                              fontSize: "1.25rem",
+                              lineHeight: "1.5rem",
+                              fontWeight: "500",
+                            },
+                          },
+                        },
+                        img: {
+                          props: {
+                            className: "shadow-md rounded-lg",
+                          },
+                        },
+                        a: {
+                          props: {
+                            className: "prose",
+                            style: {
+                              textDecoration: "underline",
+                              color: "#2563eb",
+                            },
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    {post.body}
+                  </Markdown>
                   <Link to={`/candidates/${post.user.userId}`}>
                     <p className="text-slate-400">{`Candidate: ${post.user.userName}`}</p>
                   </Link>
@@ -53,6 +113,15 @@ export default function Index() {
               </div>
             </div>
           ))}
+          <Form className=" flex w-full items-center justify-center gap-6">
+            {[...Array(totalPages)].map((e, i) =>
+              i * 3 < totalPages ? (
+                <button key={i + 1} type="page" name="p" value={i + 1}>
+                  {i + 1}
+                </button>
+              ) : null
+            )}
+          </Form>
         </div>
         <div className=" flex flex-col gap-4 flex-1">
           <div>
@@ -64,9 +133,57 @@ export default function Index() {
               {jobPosts.map((jobPost) => (
                 <div
                   key={jobPost._id}
-                  className="bg-white p-4 rounded-xl shadow-md"
+                  className="bg-white p-4 rounded-xl shadow-md 1:text-2xl h1:font-bold h2:text-xl h2:font-semibold h3:text-lg h3:font-semibold h4:text-md h4:font-semibold img:max-h-64 img:shadow-md img:rounded-lg"
                 >
-                  <Markdown>{jobPost.body}</Markdown>
+                  <Markdown
+                    options={{
+                      overrides: {
+                        h1: {
+                          props: {
+                            style: {
+                              fontSize: "1.75rem",
+                              lineHeight: "2rem",
+                              fontWeight: "600",
+                            },
+                          },
+                        },
+                        h2: {
+                          props: {
+                            style: {
+                              fontSize: "1.5rem",
+                              lineHeight: "1.75rem",
+                              fontWeight: "500",
+                            },
+                          },
+                        },
+                        h3: {
+                          props: {
+                            style: {
+                              fontSize: "1.25rem",
+                              lineHeight: "1.5rem",
+                              fontWeight: "500",
+                            },
+                          },
+                        },
+                        img: {
+                          props: {
+                            className: "shadow-md rounded-lg",
+                          },
+                        },
+                        a: {
+                          props: {
+                            className: "prose",
+                            style: {
+                              textDecoration: "underline",
+                              color: "#2563eb",
+                            },
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    {jobPost.body}
+                  </Markdown>
                 </div>
               ))}
             </div>
