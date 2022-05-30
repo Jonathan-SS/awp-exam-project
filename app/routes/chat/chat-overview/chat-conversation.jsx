@@ -4,7 +4,7 @@ import {
   useTransition,
   useFetcher,
 } from "@remix-run/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import connectDb from "~/db/connectDb.server";
 import { getSession } from "../../../sessions.server";
 
@@ -137,17 +137,17 @@ export async function loader({ request }) {
 export default function ChatConversation() {
   const actionData = useActionData();
   const fetcher = useFetcher();
+  const formRef = useRef();
   let transition = useTransition();
   const [chatId, setChatId] = useState();
   const [chat, setChat] = useState({});
   const [user, setUser] = useState({});
   const [participant, setParticipant] = useState({});
-
-  const buttonText =
+  let sending =
     transition.state === "submitting" &&
-    transition.submission.formData.get("_action") === "sendMessage"
-      ? "Sending..."
-      : "Send";
+    transition.submission.formData.get("_action") === "sendMessage";
+
+  const buttonText = sending ? "Sending..." : "Send";
 
   useEffect(() => {
     setChat(actionData?.chat);
@@ -158,6 +158,12 @@ export default function ChatConversation() {
     setChatId(actionData?.chatId);
     setUser(actionData?.user);
   }, [actionData?.chatId, actionData?.participant, actionData?.user]);
+
+  useEffect(() => {
+    if (!sending) {
+      formRef.current?.reset();
+    }
+  }, [sending]);
 
   //useEffect below used to keep the chat up to date by refetching it every third second
   //It would be optimal with websockts here, but I don't have time to implement them(or learn how to)
@@ -251,7 +257,7 @@ export default function ChatConversation() {
             )}
           </div>
 
-          <Form method="post" className="flex items-end">
+          <Form method="post" className="flex items-end" ref={formRef}>
             <input
               className=" resize-none p-2 rounded-lg mr-2 border border-gray-200 flex-1"
               name="message"
