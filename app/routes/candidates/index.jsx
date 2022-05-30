@@ -217,7 +217,7 @@ export default function Candidates() {
                       : "/403017_avatar_default_head_person_unknown_icon.png"
                   }
                   alt=""
-                  className="w-full h-auto rounded-full mr-4"
+                  className="w-32 h-32 rounded-full mr-4 object-cover"
                 />
               </Link>
 

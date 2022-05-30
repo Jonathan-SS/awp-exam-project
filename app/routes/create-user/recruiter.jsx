@@ -21,11 +21,26 @@ export async function action({ request }) {
 
   try {
     if (form.get("Password") !== form.get("PasswordRepeat")) {
+      let values = Object.fromEntries(form);
+      values = {
+        ...values,
+        Password: {
+          value: form.get("Password"),
+          message: "Passwords do not match ",
+        },
+        PasswordRepeat: {
+          value: form.get("PasswordRepeat"),
+          message: "Passwords do not match ",
+        },
+      };
+
       return json(
         {
           errors: {
-            password: "Passwords do not match.",
+            Password: "Passwords do not match ",
+            PasswordRepeat: "Passwords do not match ",
           },
+          values,
         },
         { status: 400 }
       );

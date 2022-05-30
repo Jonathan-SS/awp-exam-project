@@ -130,7 +130,7 @@ export default function Candidate() {
     submit(event.currentTarget, { replace: true });
   }
   function handleDelete(event) {
-    submit(null, { method: "post", action: "../delete-account" });
+    submit(null, { method: "get", action: "../delete-account" });
   }
 
   function checkNumberOfLines(e) {

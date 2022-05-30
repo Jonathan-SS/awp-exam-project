@@ -219,7 +219,7 @@ export default function ChatConversation() {
                           : "/403017_avatar_default_head_person_unknown_icon.png"
                       }
                       alt=""
-                      className="w-12 h-12 rounded-full "
+                      className="w-12 h-12 rounded-full object-cover "
                     />
                     <div className=" flex-1 ">
                       <p

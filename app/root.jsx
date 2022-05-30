@@ -67,7 +67,7 @@ export const links = () => [
 export function meta() {
   return {
     charset: "utf-8",
-    title: "Cnnect - ",
+    title: "Cnnect -  Candidates fo IT",
     viewport: "width=device-width,initial-scale=1",
     robots: "noindex,nofollow",
     "msapplication-TileColor": "content=#15803d",
@@ -98,29 +98,34 @@ export async function loader({ request }) {
     const thisUserInfo = chat.participants.filter(
       (participant) => participant.userId == userId
     );
-    console.log(thisUserInfo[0].hasRead);
+
     if (thisUserInfo[0]?.hasRead === false) {
-      console.log("Der er en unread");
       unRead += 1;
     }
   });
-  console.log("herherher", unRead);
 
   if (session.has("userId")) {
     return {
-      loggedIn: true,
+      loggedInLoader: true,
       messages: chatMessages,
-      userType: userType.userType,
+      userTypelLoader: userType?.userType,
       unRead,
     };
   }
 
-  return { loggedIn: false, messages: chatMessages, userType, unRead };
+  return {
+    loggedInLoader: false,
+    messages: chatMessages,
+    userTypelLoader: userType,
+    unRead,
+  };
 }
 
 export default function App() {
-  const { loggedIn, userType, unRead } = useLoaderData();
+  const { loggedInLoader, userTypelLoader, unRead } = useLoaderData();
+  console.log(loggedInLoader);
   const [loggedin, setLoggedin] = useState(false);
+  const [userTypeState, setUserTypeState] = useState(null);
   console.log(unRead);
 
   //TODO: add dark mode style
@@ -129,11 +134,12 @@ export default function App() {
     if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
       document.documentElement.classList.add("dark");
     }
-    setLoggedin(loggedIn);
-  }, [loggedIn]);
+    setLoggedin(loggedInLoader || false);
+    setUserTypeState(userTypelLoader || null);
+  }, [loggedInLoader, userTypelLoader]);
 
   return (
-    <Layout unRead={unRead} loggedin={loggedin} userType={userType}>
+    <Layout unRead={unRead} loggedin={loggedin} userType={userTypeState}>
       <Outlet />
     </Layout>
   );
@@ -245,15 +251,15 @@ export function Layout({ children, ...rest }) {
         >
           <div className=" absolute left-0 px-1 z-50">
             <button onClick={showMobileMenu}>
-              {navIsOpen ? <Close /> : <BurgerMenu />}
+              {navIsOpen ? <Close className="h-8 w-8" /> : <BurgerMenu />}
             </button>
           </div>
           <Link to="/">
-            <Logo className="h-auto w-20" />
+            <Logo className="h-auto w-24" />
           </Link>
         </div>
 
-        <main className="flex-1 px-4 py-7 md:ml-14 z-20 md:mt-0 mt-4">
+        <main className="flex-1 px-4 py-7 md:ml-14 z-20 md:mt-0 mt-8">
           {children}
         </main>
 

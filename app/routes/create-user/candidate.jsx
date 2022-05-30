@@ -17,11 +17,27 @@ export async function action({ request }) {
 
   try {
     if (form.get("Password") !== form.get("PasswordRepeat")) {
+      console.log("wrong password");
+      let values = Object.fromEntries(form);
+      values = {
+        ...values,
+        Password: {
+          value: form.get("Password"),
+          message: "Passwords do not match ",
+        },
+        PasswordRepeat: {
+          value: form.get("PasswordRepeat"),
+          message: "Passwords do not match ",
+        },
+      };
+
       return json(
         {
           errors: {
-            password: "Passwords do not match.",
+            Password: "Passwords do not match ",
+            PasswordRepeat: "Passwords do not match ",
           },
+          values,
         },
         { status: 400 }
       );
@@ -48,6 +64,7 @@ export async function action({ request }) {
     });
   } catch (error) {
     console.log(error);
+
     return json(
       { errors: error.errors, values: Object.fromEntries(form) },
       { status: 400 }
@@ -57,6 +74,7 @@ export async function action({ request }) {
 
 export default function Candidate(params) {
   const actionData = useActionData();
+  console.log(actionData);
 
   return (
     <div className="flex flex-col items-center">
@@ -71,31 +89,33 @@ export default function Candidate(params) {
         <InputField
           name="firstname"
           placeholder="First Name"
-          actionData={actionData?.errors.firstname}
+          actionData={actionData?.errors?.firstname?.message}
           defaultValue={actionData?.values.firstname}
         />
         <InputField
           name="lastname"
           placeholder="Last Name"
-          actionData={actionData?.errors.lastname}
+          actionData={actionData?.errors?.lastname?.message}
           defaultValue={actionData?.values.lastname}
         />
         <InputField
           name="email"
           placeholder="Email"
-          actionData={actionData?.errors.email}
+          actionData={actionData?.errors?.email?.message}
           defaultValue={actionData?.values.email}
         />
         <InputField
           name="Password"
+          required={true}
           placeholder="Password, minimum 8 characters"
-          actionData={actionData?.errors.Password}
+          actionData={actionData?.errors?.Password}
           defaultValue={actionData?.values.Password}
         />
         <InputField
           name="PasswordRepeat"
           placeholder="Repeat password"
-          actionData={actionData?.errors.PasswordRepeat}
+          required={true}
+          actionData={actionData?.errors?.PasswordRepeat}
           defaultValue={actionData?.values.PasswordRepeat}
         />
 

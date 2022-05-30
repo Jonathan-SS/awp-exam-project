@@ -124,7 +124,7 @@ export default function Chat() {
                             : "/403017_avatar_default_head_person_unknown_icon.png"
                         }
                         alt=""
-                        className="w-12 h-12 rounded-full mr-2"
+                        className="w-12 h-12 rounded-full mr-2 object-cover"
                       />
                       <div className=" text-left">
                         <h3 className=" text-xl font-semibold">

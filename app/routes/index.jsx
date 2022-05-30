@@ -2,9 +2,15 @@ import { useLoaderData, Link, Form } from "@remix-run/react";
 import connectDb from "~/db/connectDb.server.js";
 
 import Markdown from "markdown-to-jsx";
+import { redirect } from "@remix-run/node";
 
 export async function loader({ request }) {
   const db = await connectDb();
+  const countUsers = await db.models.User.countDocuments();
+  console.log("count", countUsers);
+  if (countUsers <= 0) {
+    return redirect("/seed");
+  }
   const url = new URL(request.url);
   let page = url.searchParams.get("p");
   if (!page) {
@@ -173,6 +179,7 @@ export default function Index() {
                         a: {
                           props: {
                             className: "prose",
+                            target: "_blank",
                             style: {
                               textDecoration: "underline",
                               color: "#2563eb",
@@ -182,7 +189,7 @@ export default function Index() {
                       },
                     }}
                   >
-                    {jobPost.body}
+                    {jobPost.body.slice(0, 150)}
                   </Markdown>
                 </div>
               ))}
@@ -210,7 +217,7 @@ export default function Index() {
                           : "/403017_avatar_default_head_person_unknown_icon.png"
                       }
                       alt=""
-                      className="w-32 h-32 rounded-full mb-2"
+                      className="w-32 h-32 rounded-full mb-2 object-cover"
                     />
                   </Link>
                   <div>

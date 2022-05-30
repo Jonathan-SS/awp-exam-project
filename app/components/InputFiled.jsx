@@ -9,7 +9,7 @@ export default function InputField({
   return (
     <>
       {actionData ? (
-        <p className="text-red-500 px-2">{actionData.message}</p>
+        <p className="text-red-500 px-2">{actionData}</p>
       ) : (
         <p className=" -mb-2 px-2 text-slate-400 ">{placeholder}</p>
       )}

@@ -22,7 +22,7 @@ export async function loader({ params, request }) {
             ],
           }
         : { postType: "jobPost" }
-    ).sort({ sort: 1 }),
+    ).sort({ createdAt: 1 }),
     allParams: allParams,
   };
 }
@@ -56,35 +56,6 @@ export default function Candidates() {
               Search
             </button>
           )}
-
-          <select
-            name="sort"
-            type="sort"
-            className="p-2 rounded-full mr-2  "
-            defaultValue={{ label: allParams.sort, value: allParams.sort }}
-          >
-            <option value="">Sort by</option>
-            <option value="firstname">First Name</option>
-            <option value="lastname">Last Name</option>
-            <option value="createdAt">Date</option>
-          </select>
-          {!hasJs && (
-            <button
-              type="submit"
-              className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
-            >
-              Sort
-            </button>
-          )}
-
-          {!hasJs && (
-            <button
-              type="submit"
-              className=" bg-green-400 px-3 py-2 rounded-full hover:bg-green-300 shadow-md hover:shadow-md mr-4"
-            >
-              Apply
-            </button>
-          )}
         </Form>
       </div>
       <ul className=" py-2 pt-4 gap-4 justify-start grid grid-cols-1 md:grid-cols-3">
@@ -102,6 +73,7 @@ export default function Candidates() {
                         fontSize: "1.75rem",
                         lineHeight: "2rem",
                         fontWeight: "600",
+                        marginBottom: "1rem",
                       },
                     },
                   },
@@ -111,6 +83,7 @@ export default function Candidates() {
                         fontSize: "1.5rem",
                         lineHeight: "1.75rem",
                         fontWeight: "500",
+                        marginBottom: "1rem",
                       },
                     },
                   },
@@ -120,6 +93,7 @@ export default function Candidates() {
                         fontSize: "1.25rem",
                         lineHeight: "1.5rem",
                         fontWeight: "500",
+                        marginBottom: "1rem",
                       },
                     },
                   },
@@ -131,6 +105,7 @@ export default function Candidates() {
                   a: {
                     props: {
                       className: "prose",
+                      target: "_blank",
                       style: {
                         textDecoration: "underline",
                         color: "#2563eb",

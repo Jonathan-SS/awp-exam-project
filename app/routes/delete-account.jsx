@@ -10,6 +10,7 @@ export async function loader({ request }) {
   const userId = session.get("userId");
   console.log(userId);
   const user = await db.models.User.deleteOne({ _id: userId });
+  console.log(user);
   return redirect("/", {
     headers: {
       "Set-Cookie": await destroySession(session),

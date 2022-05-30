@@ -149,7 +149,7 @@ export const models = [
   {
     name: "User",
     schema: userSchema,
-    collection: "Users",
+    collection: "users",
   },
   {
     name: "Post",

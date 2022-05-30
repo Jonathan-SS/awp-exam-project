@@ -166,7 +166,9 @@ export default function Profile() {
       <div className=" flex flex-col gap-4 flex-1">
         <div className=" flex-2 bg-white p-4 rounded-xl shadow-md">
           <h2 className=" font-bold text-2xl mb-4">
-            Share a Post on your profile
+            {user.userType === "recruiter"
+              ? "Share a job post for your company"
+              : "Share a Post on your profile"}
           </h2>
           <Form
             ref={formRef}
@@ -223,7 +225,7 @@ export default function Profile() {
             key={post._id}
             className="bg-white p-6 rounded-xl shadow-md h-100 h1"
           >
-            <div className="rounded-lg relative hover:text-2xl ">
+            <div className="rounded-lg relative ">
               <div className="">
                 <Markdown
                   options={{
@@ -234,6 +236,7 @@ export default function Profile() {
                             fontSize: "1.75rem",
                             lineHeight: "2rem",
                             fontWeight: "600",
+                            marginBottom: "1rem",
                           },
                         },
                       },
@@ -243,6 +246,7 @@ export default function Profile() {
                             fontSize: "1.5rem",
                             lineHeight: "1.75rem",
                             fontWeight: "500",
+                            marginBottom: "1rem",
                           },
                         },
                       },
@@ -252,17 +256,22 @@ export default function Profile() {
                             fontSize: "1.25rem",
                             lineHeight: "1.5rem",
                             fontWeight: "500",
+                            marginBottom: "1rem",
                           },
                         },
                       },
                       img: {
                         props: {
                           className: "shadow-md rounded-lg",
+                          marginBottom: "1rem",
+                          marginTop: "1rem",
+                          maxHeight: "200px",
                         },
                       },
                       a: {
                         props: {
                           className: "prose",
+                          target: "_blank",
                           style: {
                             textDecoration: "underline",
                             color: "#2563eb",
