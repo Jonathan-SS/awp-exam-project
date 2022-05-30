@@ -4,8 +4,6 @@ export default function InputField({
   actionData,
   defaultValue,
 }) {
-  console.log(name);
-
   return (
     <>
       {actionData ? (

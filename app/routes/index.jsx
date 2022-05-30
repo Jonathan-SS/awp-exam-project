@@ -7,41 +7,38 @@ import { redirect } from "@remix-run/node";
 export async function loader({ request }) {
   const db = await connectDb();
   const countUsers = await db.models.User.countDocuments();
-  console.log("count", countUsers);
   if (countUsers <= 0) {
     return redirect("/seed");
   }
   const url = new URL(request.url);
   let page = url.searchParams.get("p");
+
   if (!page) {
     page = 1;
   }
-  console.log("herunder");
-  console.log(page);
+
   const posts = await db.models.Post.find({
     postType: "post",
   })
     .limit(3)
     .skip(3 * (page - 1))
     .sort({ createdAt: -1 });
+
   const totalPages = await db.models.Post.countDocuments({ postType: "post" });
-  console.log(totalPages);
+
   const jobPosts = await db.models.Post.find({
     postType: "jobPost",
   }).limit(4);
+
   const candidates = await db.models.User.find({
     userType: "candidate",
   }).limit(4);
-
-  console.log(candidates);
 
   return { posts, jobPosts, candidates, totalPages };
 }
 
 export default function Index() {
   const { posts, jobPosts, candidates, totalPages } = useLoaderData();
-
-  //TODOne make cool welcomming page
   return (
     <>
       <h1 className=" mb-4  font-bold text-2xl md:text-4xl">
@@ -106,7 +103,7 @@ export default function Index() {
                     {post.body}
                   </Markdown>
                   <Link to={`/candidates/${post.user.userId}`}>
-                    <p className="text-slate-400">{`Candidate: ${post.user.userName}`}</p>
+                    <p className="text-slate-400 hover:text-slate-600 underline">{`Candidate: ${post.user.userName}`}</p>
                   </Link>
 
                   <p className="text-slate-400">
@@ -194,7 +191,7 @@ export default function Index() {
                 </div>
               ))}
             </div>
-            <Link className="px-1" to="/job-posts">
+            <Link className="px-1 underline " to="/job-posts">
               See more
             </Link>
           </div>
@@ -243,14 +240,12 @@ export default function Index() {
                 </div>
               ))}
             </div>
-            <Link to="/candidates">See more</Link>
+            <Link className="underline" to="/candidates">
+              See more
+            </Link>
           </div>
         </div>
       </div>
     </>
   );
 }
-
-//TODO: add pagination to the posts
-//TODO: add show more to posts
-//TODO: set up messaging system

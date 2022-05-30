@@ -19,6 +19,7 @@ export async function action({ request }) {
   const participant = await db.models.User.findById(form.get("participantId"));
   let chat = {};
 
+  //Checks if the action is to send a message
   if (form.get("_action") === "sendMessage") {
     const message = form.get("message");
 
@@ -35,7 +36,7 @@ export async function action({ request }) {
       }
     );
   }
-
+  //Checks if there is an existing chat with the participants
   async function exsistingChatCheck(userId, participantId) {
     return await db.models.Chat.findOne({
       $and: [
@@ -54,19 +55,17 @@ export async function action({ request }) {
   }
 
   if (chatId) {
-    console.log("vi er her ", chatId);
     chat = await db.models.Chat.findOne({
       _id: chatId,
     });
+    //function below checks for changes in char collection, and returns chat if there is
+    // db.models.Chat.watch().on("change", async (change) => {
+    //   chat = await db.models.Chat.findOne({
+    //     _id: chatId,
+    //   });
 
-    // TODO find a way to return new actionData on change
-    db.models.Chat.watch().on("change", async (change) => {
-      chat = await db.models.Chat.findOne({
-        _id: chatId,
-      });
-      console.log("chat", chat);
-      return chat;
-    });
+    //   return chat;
+    // });
   } else {
     chat = await exsistingChatCheck(userId, form.get("participantId"));
   }
@@ -107,10 +106,8 @@ export async function action({ request }) {
 
 export async function loader({ request }) {
   const db = await connectDb();
-  console.log(request);
   const url = new URL(request.url);
   const chatId = url.searchParams.get("chatId");
-  console.log("this is it", chatId);
 
   if (
     chatId !== "unknown" &&
@@ -118,7 +115,6 @@ export async function loader({ request }) {
     chatId !== null &&
     chatId !== "undefined"
   ) {
-    console.log("chatId", chatId);
     return await db.models.Chat.findOne({
       _id: chatId,
     });
@@ -152,8 +148,8 @@ export default function ChatConversation() {
     setUser(actionData?.user);
   }, [actionData?.chatId, actionData?.participant, actionData?.user]);
 
-  //https://benborgers.com/posts/remix-poll
-
+  //useEffect below used to keep the chat up to date by refetching it every third second
+  //It would be optimal with websockts here, but I don't have time to implement them(or learn how to)
   useEffect(() => {
     const interval = setInterval(() => {
       if (

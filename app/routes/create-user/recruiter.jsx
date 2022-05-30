@@ -1,6 +1,3 @@
-//TODO  make a new file in app/routes/create-user/recruiter.jsx
-//it should be the same as app/routes/create-user/candidate.jsx
-// but for recruiters
 import { Form, useActionData } from "@remix-run/react";
 import Logo from "../../icons/Logo";
 import connectDb from "~/db/connectDb.server";
@@ -10,10 +7,8 @@ import { commitSession, getSession } from "../../sessions.server";
 import InputField from "../../components/InputFiled";
 
 export async function action({ request }) {
-  console.log("test");
   const db = await connectDb();
   const form = await request.formData();
-  console.log(form);
   const firstname = form.get("firstname").trim();
   const lastname = form.get("lastname");
   const email = form.get("email");
@@ -46,7 +41,6 @@ export async function action({ request }) {
       );
     }
     const password = await bcrypt.hash(form.get("Password"), 10);
-    console.log(password);
 
     const user = await db.models.User.create({
       company,
@@ -56,7 +50,7 @@ export async function action({ request }) {
       password,
       userType: "recruiter",
     });
-    console.log(user);
+
     const session = await getSession(request.headers.get("Cookie"));
     session.set("userId", user.id);
 
@@ -67,7 +61,6 @@ export async function action({ request }) {
       },
     });
   } catch (error) {
-    console.log(error);
     return json(
       { errors: error.errors, values: Object.fromEntries(form) },
       { status: 400 }
@@ -77,7 +70,7 @@ export async function action({ request }) {
 
 export default function Recruiter() {
   const actionData = useActionData();
-  console.log(actionData);
+
   return (
     <div className="flex flex-col items-center">
       <Logo />
@@ -135,4 +128,3 @@ export default function Recruiter() {
     </div>
   );
 }
-//TODO refractor input fields into cpmponent

@@ -10,7 +10,6 @@ import Eye from "../icons/Eye";
 import EyeClosed from "../icons/EyeClosed";
 
 export async function action({ request }) {
-  console.log("test");
   const db = await connectDb();
   const form = await request.formData();
   const password = form.get("Password");
@@ -32,7 +31,6 @@ export async function action({ request }) {
 
     const dbPassword = user.password;
     if (!(await bcrypt.compare(password, dbPassword))) {
-      console.log("wrong password");
       return json(
         {
           errors: {
@@ -53,8 +51,6 @@ export async function action({ request }) {
       },
     });
   } catch (error) {
-    console.log(Object.fromEntries(form));
-    console.log(error);
     return json(
       { errors: error.errors, values: Object.fromEntries(form) },
       { status: 400 }
@@ -65,7 +61,7 @@ export async function action({ request }) {
 export default function LogIn(params) {
   const actionData = useActionData();
   const [showPassword, setShowPassword] = useState(false);
-  console.log(actionData);
+
   return (
     <div className="flex flex-col items-center relative">
       <Logo />
@@ -126,7 +122,10 @@ export default function LogIn(params) {
         </button>
       </div>
 
-      <Link className=" md:w-96 text-left px-2 mt-2" to="/create-user">
+      <Link
+        className=" md:w-96 text-left px-2 mt-2 underline"
+        to="/create-user"
+      >
         Sign up!
       </Link>
     </div>

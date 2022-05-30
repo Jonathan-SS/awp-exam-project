@@ -1,26 +1,24 @@
-import { Form, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { Link } from "react-router-dom";
 import connectDb from "~/db/connectDb.server";
-import { getSession } from "../../sessions.server";
+
 import Markdown from "markdown-to-jsx";
 
 export async function loader({ request, params }) {
   const db = await connectDb();
   const userId = params.candidateId;
   const user = await db.models.User.findById(userId);
-  const posts = [];
-  const postIds = user.get("posts");
-  for (let i = 0; i < postIds?.length; i++) {
-    const post = await db.models.Post.findById(postIds[i]);
-    posts.push(post);
-  }
+
+  const posts = await db.models.Post.find({
+    "user.userId": userId,
+  });
 
   return { user, posts };
 }
 
 export default function Profile() {
   const { user, posts } = useLoaderData();
-  console.log(user);
+
   return (
     <div className="flex gap-8 md:gap-4 flex-col md:flex-row">
       <div className=" h-full md:w-80 bg-white p-4 rounded-xl shadow-md">
@@ -102,7 +100,62 @@ export default function Profile() {
             >
               <div className="rounded-lg relative">
                 <div className=" h1:text-3xl">
-                  <Markdown>{post.body}</Markdown>
+                  <Markdown
+                    options={{
+                      overrides: {
+                        h1: {
+                          props: {
+                            style: {
+                              fontSize: "1.75rem",
+                              lineHeight: "2rem",
+                              fontWeight: "600",
+                              marginBottom: "1rem",
+                            },
+                          },
+                        },
+                        h2: {
+                          props: {
+                            style: {
+                              fontSize: "1.5rem",
+                              lineHeight: "1.75rem",
+                              fontWeight: "500",
+                              marginBottom: "1rem",
+                            },
+                          },
+                        },
+                        h3: {
+                          props: {
+                            style: {
+                              fontSize: "1.25rem",
+                              lineHeight: "1.5rem",
+                              fontWeight: "500",
+                              marginBottom: "1rem",
+                            },
+                          },
+                        },
+                        img: {
+                          props: {
+                            className: "shadow-md rounded-lg",
+                            marginBottom: "1rem",
+                            marginTop: "1rem",
+                            maxHeight: "200px",
+                          },
+                        },
+                        a: {
+                          props: {
+                            className: "prose",
+                            target: "_blank",
+                            style: {
+                              textDecoration: "underline",
+                              color: "#2563eb",
+                            },
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    {post.body}
+                  </Markdown>
 
                   <p className="text-slate-400">
                     {user

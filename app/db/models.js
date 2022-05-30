@@ -142,9 +142,6 @@ const chatSchema = new Schema(
   },
   { timestamps: true }
 );
-
-//TODOne: nake only one schema for all users
-
 export const models = [
   {
     name: "User",

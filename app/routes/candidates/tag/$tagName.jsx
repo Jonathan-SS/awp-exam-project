@@ -1,5 +1,4 @@
 import { useLoaderData, Link, Form, useSubmit } from "@remix-run/react";
-import { useState, useEffect } from "react";
 import Chat from "../../../icons/Chat";
 
 import connectDb from "~/db/connectDb.server.js";

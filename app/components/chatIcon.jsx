@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 
 export default function ChatIcon({ icon, label, to, onClick, unRead }) {
-  console.log("unRead", unRead);
   function showToolTip(item) {
     const tooltip = document.getElementById(`${item}-ToolTip`);
 

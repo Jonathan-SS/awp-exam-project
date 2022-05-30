@@ -11,17 +11,13 @@ import {
 import { getSession, requireSession } from "../../sessions.server";
 import Plus from "../../icons/Plus";
 
-//TODO add delete prfile option
 export async function loader({ request }) {
   await requireSession(request);
   const db = await connectDb();
   const cookie = request.headers.get("Cookie");
-
   const session = await getSession(cookie);
   const userId = session.get("userId");
-  console.log(userId);
   const user = await db.models.User.findById(userId);
-  console.log(user);
   return user;
 }
 
@@ -44,10 +40,9 @@ export async function action({ request }) {
 
   const image = formData.get("image");
   if (image) {
-    const imageUpload = await db.models.User.findByIdAndUpdate(userId, {
+    await db.models.User.findByIdAndUpdate(userId, {
       image: image,
     });
-    console.log(imageUpload.image);
   }
 
   const form = await request.formData();
@@ -79,7 +74,6 @@ export async function action({ request }) {
     const passwordCheck = async () => {
       if (formData.get("Password").length > 0) {
         if (formData.get("Password") !== formData.get("PasswordRepeat")) {
-          console.log("password not the same");
           return json({
             errors: {
               password: "Passwords do not match",
@@ -114,7 +108,6 @@ export async function action({ request }) {
     }
     return null;
   } catch (error) {
-    console.log(error);
     return json(
       { errors: error.errors, values: Object.fromEntries(form) },
       { status: 400 }
@@ -141,7 +134,6 @@ export default function Candidate() {
   }
   function checkNumberOfCommas(e) {
     const commas = e.target.value.split(",").length;
-    console.log(commas);
     if (commas > 5) {
       e.target.value = "That's too many tags, try again";
     }
@@ -309,6 +301,3 @@ export default function Candidate() {
     </div>
   );
 }
-
-//TODO: move buttons and links in to a seperate component, so they can be reused in the forms
-//TODO: make a tooltip self, code is actiong up

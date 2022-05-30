@@ -1,5 +1,4 @@
-import { useLoaderData, Link, Form, useSubmit } from "@remix-run/react";
-import { useState, useEffect } from "react";
+import { useLoaderData, Form, useSubmit } from "@remix-run/react";
 import Markdown from "markdown-to-jsx";
 
 import connectDb from "~/db/connectDb.server.js";
@@ -131,8 +130,3 @@ export default function Candidates() {
     </div>
   );
 }
-//TODO limit desciptions on both posttypes
-//TODO add view and hide on passwords
-//TODO add ability for recruiters to save candidates
-//TODO research how to update chats and the chat icon in the nav
-//TODO responsive design

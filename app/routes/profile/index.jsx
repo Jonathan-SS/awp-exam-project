@@ -13,7 +13,6 @@ import Close from "../../icons/Close";
 import { json } from "@remix-run/node";
 import ReactTooltip from "react-tooltip";
 
-//TODO add option to change image and add one
 export async function loader({ request, params }) {
   await requireSession(request);
   const db = await connectDb();
@@ -75,7 +74,6 @@ export const action = async ({ request }) => {
 export default function Profile() {
   const { user, posts } = useLoaderData();
   const actionData = useActionData();
-  console.log(user.image);
 
   let transition = useTransition();
   let isAdding =
@@ -104,7 +102,9 @@ export default function Profile() {
           />
         </div>
 
-        <Link to="/profile/edit"> Edit profile</Link>
+        <Link className="underline" to="/profile/edit">
+          Edit profile
+        </Link>
 
         <div className="pt-2 flex flex-col gap-2">
           <h2 className="text-xl font-semibold">{`${user?.firstname} ${user?.lastname}`}</h2>
@@ -312,7 +312,3 @@ export default function Profile() {
     </div>
   );
 }
-
-//TODOone set up ability to add a post to profile and delete it
-//TODOone set up way to use markdown to add a post
-//TODO add a profile page for recruiters where they can post jobs

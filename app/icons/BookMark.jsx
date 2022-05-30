@@ -1,5 +1,4 @@
 export default function BookMark({ filled, menuItem }) {
-  console.log(menuItem);
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

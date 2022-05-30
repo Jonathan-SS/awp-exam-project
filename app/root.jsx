@@ -123,14 +123,12 @@ export async function loader({ request }) {
 
 export default function App() {
   const { loggedInLoader, userTypelLoader, unRead } = useLoaderData();
-  console.log(loggedInLoader);
   const [loggedin, setLoggedin] = useState(false);
   const [userTypeState, setUserTypeState] = useState(null);
-  console.log(unRead);
 
-  //TODO: add dark mode style
   useEffect(() => {
     //checks if the user prefers dark mode
+    //Dark mode styling and toggle not implemented
     if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
       document.documentElement.classList.add("dark");
     }
@@ -307,4 +305,3 @@ export function ErrorBoundary({ error }) {
     </Layout>
   );
 }
-//TODO: add ability to report bugs maybe?

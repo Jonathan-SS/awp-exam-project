@@ -7,17 +7,14 @@ import { commitSession, getSession } from "../../sessions.server";
 import InputField from "../../components/InputFiled";
 
 export async function action({ request }) {
-  console.log("test");
   const db = await connectDb();
   const form = await request.formData();
-  console.log(form);
   const firstname = form.get("firstname").trim();
   const lastname = form.get("lastname");
   const email = form.get("email");
 
   try {
     if (form.get("Password") !== form.get("PasswordRepeat")) {
-      console.log("wrong password");
       let values = Object.fromEntries(form);
       values = {
         ...values,
@@ -43,7 +40,6 @@ export async function action({ request }) {
       );
     }
     const password = await bcrypt.hash(form.get("Password"), 10);
-    console.log(password);
 
     const user = await db.models.User.create({
       firstname,
@@ -52,7 +48,6 @@ export async function action({ request }) {
       password,
       userType: "candidate",
     });
-    console.log(user);
     const session = await getSession(request.headers.get("Cookie"));
     session.set("userId", user.id);
 
@@ -63,8 +58,6 @@ export async function action({ request }) {
       },
     });
   } catch (error) {
-    console.log(error);
-
     return json(
       { errors: error.errors, values: Object.fromEntries(form) },
       { status: 400 }
@@ -74,7 +67,6 @@ export async function action({ request }) {
 
 export default function Candidate(params) {
   const actionData = useActionData();
-  console.log(actionData);
 
   return (
     <div className="flex flex-col items-center">

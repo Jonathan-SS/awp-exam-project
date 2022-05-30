@@ -6,6 +6,7 @@ import connectDb from "~/db/connectDb.server";
 import { Outlet } from "react-router";
 import Close from "../../icons/Close";
 
+//please do test out the chat functionality
 export async function loader({ request, params }) {
   await requireSession(request);
   const db = await connectDb();
@@ -35,7 +36,6 @@ export async function loader({ request, params }) {
           },
         }
   ).sort({ updatedAt: -1 });
-  console.log(nameSearch);
 
   return { userId, chats, nameSearch };
 }
@@ -63,8 +63,6 @@ export default function Chat() {
       return participant.userId !== userId;
     });
   });
-
-  console.log(chats);
 
   return (
     <div className="flex flex-col md:flex-row gap-4 h-screen -my-8 py-8 ">
@@ -149,12 +147,3 @@ export default function Chat() {
     </div>
   );
 }
-
-//TODO add image to users
-//TODO Add ability to delete messages
-// TODO fix overflow of messages with no scroll
-
-// TODOne next, fix whole chat logic to new schema
-// TODO fix this bug
-
-// TODO find a way to get the info of the participant who is not the user

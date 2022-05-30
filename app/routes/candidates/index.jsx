@@ -4,7 +4,7 @@ import connectDb from "~/db/connectDb.server.js";
 import useJs from "../../hooks/useJs";
 import BookMark from "../../icons/BookMark";
 import Chat from "../../icons/Chat";
-import { getSession, requireSession } from "../../sessions.server";
+import { getSession } from "../../sessions.server";
 
 export async function loader({ params, request }) {
   const db = await connectDb();
@@ -103,7 +103,6 @@ export async function action({ request }) {
 
   switch (form.get("_action")) {
     case "bookmarkCandidate":
-      console.log(form.get("bookmarked"));
       if (form.get("bookmarked") === "true") {
         await db.models.User.findByIdAndUpdate(userId, {
           $pull: { savedCandidates: form.get("_id") },
@@ -304,5 +303,3 @@ export default function Candidates() {
     </div>
   );
 }
-// TODOne: add a way to show all tags from every user
-// TODOne: fix the bios of the users

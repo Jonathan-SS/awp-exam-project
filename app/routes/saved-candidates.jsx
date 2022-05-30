@@ -24,9 +24,7 @@ export async function loader({ params, request }) {
   );
   const user = await db.models.User.findById(userId);
   const userType = user.userType;
-  console.log(userType);
   const savedIds = user.savedCandidates;
-  console.log(savedIds);
 
   if (tag) {
     return {
@@ -106,7 +104,6 @@ export async function action({ request }) {
 
   switch (form.get("_action")) {
     case "bookmarkCandidate":
-      console.log(form.get("bookmarked"));
       if (form.get("bookmarked") === "true") {
         await db.models.User.findByIdAndUpdate(userId, {
           $pull: { savedCandidates: form.get("_id") },
@@ -225,7 +222,7 @@ export default function SavedCandidates() {
               <div className=" w-2/3 flex flex-col gap-2 justify-items-start">
                 <div className="flex justify-between items-center">
                   <Link to={`/candidates/${candidate._id}`} className="z-10">
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-xl font-semibold underline">
                       {`${candidate.firstname} ${candidate.lastname}`}
                     </h2>
                   </Link>
@@ -286,5 +283,3 @@ export default function SavedCandidates() {
     </div>
   );
 }
-// TODOne: add a way to show all tags from every user
-// TODOne: fix the bios of the users
